@@ -638,9 +638,12 @@ const Account7Form = () => {
         proposedFeeTwelve: parseInt(form.previousFees.XII.proposed) || 0,
         previousOrderFeeTwelve: parseInt(form.previousFees.XII.previous) || 0,
   
+        // Status fields
         account7: "Completed",
         AttendedBy: attendedBy,
-        status: calculatedStatus  // Using the calculated status here
+        status: calculatedStatus,  // Using the calculated status here
+        lastUpdatedBy: loginResponse?.output?.data?.userName || "Unknown User",
+        lastUpdatedAt: new Date().toISOString()
       };
   
       console.log('Request Details:', {
@@ -667,11 +670,11 @@ const Account7Form = () => {
       if (response.status === 200) {
         alert("Success");
         
-        // Navigate based on the same condition
+        // Navigate based on the calculated status
         if (totals.difference >= 0) {
-          navigate('/objection');
-        } else {
           navigate('/approve');
+        } else {
+          navigate('/objection');
         }
       } else {
         throw new Error(
