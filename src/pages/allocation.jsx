@@ -5,7 +5,7 @@ import api from '../api/api';
 const AllocationForm = () => {
   const [forms, setForms] = useState([]);
   const [sections, setSections] = useState([]);
-  const [selectedForm, setSelectedForm] = useState(null);
+  const [selectedForms, setSelectedForms] = useState([]);
   const [selectedSection, setSelectedSection] = useState('');
   const [selectedSectionId, setSelectedSectionId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -48,14 +48,41 @@ const AllocationForm = () => {
     }
   };
 
-  const handleFormSelect = (form) => setSelectedForm(form);
+  const handleFormSelect = (form) => {
+    setSelectedForms(prev => {
+      // Check if the form is already selected
+      const isSelected = prev.some(f => f.id === form.id);
+      
+      if (isSelected) {
+        // Remove it if it's already selected
+        return prev.filter(f => f.id !== form.id);
+      } else {
+        // Add it if it's not selected
+        return [...prev, form];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedForms.length === forms.length) {
+      // If all forms are already selected, deselect all
+      setSelectedForms([]);
+    } else {
+      // Otherwise, select all forms
+      setSelectedForms([...forms]);
+    }
+  };
 
   const handleAllocation = async () => {
-    if (!selectedSectionId || !selectedForm) {
-      setError('Please select both a form and a section.');
+    if (!selectedSectionId || selectedForms.length === 0) {
+      setError('Please select both forms and a section.');
       return;
     }
+    
     setLoading(true);
+    setError(null);
+    setSuccess(false);
+    
     try {
       const loginResponse = JSON.parse(localStorage.getItem('loginResponse'));
       const token = loginResponse?.output?.token;
@@ -64,17 +91,43 @@ const AllocationForm = () => {
         navigate('/login');
         return;
       }
-      const response = await api.put(`/allocateFeeForm?id=${selectedForm.id}`,
-        { allocatedTo: selectedSectionId },
-        { headers: { 'Authorization': token, 'Content-Type': 'application/json' } }
+      
+      // Process all allocations
+      const allocationPromises = selectedForms.map(form => 
+        api.put(`/allocateFeeForm?id=${form.id}`,
+          { allocatedTo: selectedSectionId },
+          { headers: { 'Authorization': token, 'Content-Type': 'application/json' } }
+        )
       );
-      if (response.status === 200) {
+      
+      // Wait for all allocations to complete
+      const results = await Promise.allSettled(allocationPromises);
+      
+      // Check if all allocations were successful
+      const allSucceeded = results.every(result => result.status === 'fulfilled' && result.value.status === 200);
+      const failedCount = results.filter(result => result.status !== 'fulfilled' || result.value.status !== 200).length;
+      
+      if (allSucceeded) {
         setSuccess(true);
-        setError(null);
         setTimeout(() => navigate('/home'), 2000);
+      } else {
+        if (failedCount === selectedForms.length) {
+          setError('Failed to allocate any forms. Please try again.');
+        } else {
+          setSuccess(true);
+          setError(`Successfully allocated ${selectedForms.length - failedCount} forms, but ${failedCount} forms failed.`);
+          // Remove successfully allocated forms from the list
+          const successfullyAllocated = results
+            .map((result, index) => ({ result, form: selectedForms[index] }))
+            .filter(item => item.result.status === 'fulfilled' && item.result.value.status === 200)
+            .map(item => item.form.id);
+          
+          setForms(forms.filter(form => !successfullyAllocated.includes(form.id)));
+          setSelectedForms(selectedForms.filter(form => !successfullyAllocated.includes(form.id)));
+        }
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to allocate form.');
+      setError(err.response?.data?.message || 'Failed to allocate forms.');
     } finally {
       setLoading(false);
     }
@@ -87,8 +140,13 @@ const AllocationForm = () => {
           <div className="p-6 sm:p-8">
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-2xl font-bold text-gray-900">Form Allocation</h1>
-              <div className="bg-indigo-50 rounded-lg px-3 py-1">
-                <span className="text-sm font-medium text-indigo-700">Forms: {forms.length}</span>
+              <div className="flex space-x-3">
+                <div className="bg-indigo-50 rounded-lg px-3 py-1">
+                  <span className="text-sm font-medium text-indigo-700">Forms: {forms.length}</span>
+                </div>
+                <div className="bg-green-50 rounded-lg px-3 py-1">
+                  <span className="text-sm font-medium text-green-700">Selected: {selectedForms.length}</span>
+                </div>
               </div>
             </div>
 
@@ -114,7 +172,7 @@ const AllocationForm = () => {
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <p className="ml-3 text-sm text-green-700">Form allocated successfully! Redirecting...</p>
+                      <p className="ml-3 text-sm text-green-700">Forms allocated successfully! Redirecting...</p>
                     </div>
                   </div>
                 )}
@@ -124,8 +182,14 @@ const AllocationForm = () => {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               <div className="lg:col-span-3">
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-                  <div className="px-6 py-4 border-b border-gray-100">
+                  <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
                     <h3 className="text-lg font-medium text-gray-900">Available Forms</h3>
+                    <button 
+                      onClick={handleSelectAll}
+                      className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                    >
+                      {selectedForms.length === forms.length ? 'Deselect All' : 'Select All'}
+                    </button>
                   </div>
                   <div className="overflow-x-auto scrollbar-thin">
                     <table className="w-full">
@@ -139,37 +203,40 @@ const AllocationForm = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {forms.map((form) => (
-                          <tr 
-                            key={form.id}
-                            onClick={() => handleFormSelect(form)}
-                            className={`cursor-pointer transition-all duration-200 ${
-                              selectedForm?.id === form.id 
-                                ? 'bg-indigo-50 hover:bg-indigo-100' 
-                                : 'hover:bg-gray-50'
-                            }`}
-                          >
-                            <td className="px-6 py-4">
-                              <div className="flex justify-center">
-                                <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                                  selectedForm?.id === form.id 
-                                    ? 'border-indigo-600 bg-indigo-600' 
-                                    : 'border-gray-300'
-                                }`}>
-                                  {selectedForm?.id === form.id && (
-                                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 12 12">
-                                      <path d="M3.72 7.96l1.07 1.07 3.43-3.43-1.06-1.07-2.37 2.36-1.06-1.06L2.66 6.9l1.06 1.06z" />
-                                    </svg>
-                                  )}
+                        {forms.map((form) => {
+                          const isSelected = selectedForms.some(f => f.id === form.id);
+                          return (
+                            <tr 
+                              key={form.id}
+                              onClick={() => handleFormSelect(form)}
+                              className={`cursor-pointer transition-all duration-200 ${
+                                isSelected 
+                                  ? 'bg-indigo-50 hover:bg-indigo-100' 
+                                  : 'hover:bg-gray-50'
+                              }`}
+                            >
+                              <td className="px-6 py-4">
+                                <div className="flex justify-center">
+                                  <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+                                    isSelected 
+                                      ? 'border-indigo-600 bg-indigo-600' 
+                                      : 'border-gray-300'
+                                  }`}>
+                                    {isSelected && (
+                                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 12 12">
+                                        <path d="M3.72 7.96l1.07 1.07 3.43-3.43-1.06-1.07-2.37 2.36-1.06-1.06L2.66 6.9l1.06 1.06z" />
+                                      </svg>
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-700">{new Date(form.formDate).toLocaleDateString()}</td>
-                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{form.schoolName}</td>
-                            <td className="px-6 py-4 text-sm text-gray-500">{form.udiseCode}</td>
-                            <td className="px-6 py-4 text-sm text-gray-500">{form.feeformSchoolId}</td>
-                          </tr>
-                        ))}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-700">{new Date(form.formDate).toLocaleDateString()}</td>
+                              <td className="px-6 py-4 text-sm font-medium text-gray-900">{form.schoolName}</td>
+                              <td className="px-6 py-4 text-sm text-gray-500">{form.udiseCode}</td>
+                              <td className="px-6 py-4 text-sm text-gray-500">{form.feeformSchoolId}</td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -209,8 +276,10 @@ const AllocationForm = () => {
                         <h4 className="text-sm font-medium text-gray-700 mb-3">Selection Summary</h4>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Form</span>
-                            <span className="text-sm font-medium text-gray-900">{selectedForm ? selectedForm.schoolName : 'Not selected'}</span>
+                            <span className="text-sm text-gray-600">Forms Selected</span>
+                            <span className="text-sm font-medium text-gray-900">
+                              {selectedForms.length > 0 ? selectedForms.length : 'None'}
+                            </span>
                           </div>
                           <div className="border-t border-gray-200 pt-3 flex items-center justify-between">
                             <span className="text-sm text-gray-600">Section</span>
@@ -221,9 +290,9 @@ const AllocationForm = () => {
 
                       <button
                         onClick={handleAllocation}
-                        disabled={loading || !selectedSection || !selectedForm}
+                        disabled={loading || !selectedSection || selectedForms.length === 0}
                         className={`w-full px-4 py-2 text-sm font-medium rounded-md shadow-sm transition-all duration-200 
-                          ${loading || !selectedSection || !selectedForm
+                          ${loading || !selectedSection || selectedForms.length === 0
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                             : 'bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
                           }`}
@@ -236,7 +305,7 @@ const AllocationForm = () => {
                             </svg>
                             Processing...
                           </span>
-                        ) : 'Allocate Form'}
+                        ) : `Allocate ${selectedForms.length} Form${selectedForms.length !== 1 ? 's' : ''}`}
                       </button>
                     </div>
                   </div>

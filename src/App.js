@@ -15,8 +15,9 @@ import Account6Form from './pages/account6';
 import Account7Form from './pages/account7';
 import ApprovalForm from './pages/approvalformat';
 import ObjectionFormPage from './pages/objectionformat';
+import UserApprovalPage from './pages/Userapproval'; // New import for the approval page
 
-// Protected Route Component with enhanced authentication check
+// Protected Route Component with simplified authentication check
 const ProtectedRoute = ({ children }) => {
   const navigate = useNavigate();
   
@@ -32,7 +33,10 @@ const ProtectedRoute = ({ children }) => {
       }
     };
 
+    // Initial check
     checkAuth();
+    
+    // Api responses will handle time-based restrictions - no need for frontend intervals
   }, [navigate]);
 
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -43,6 +47,18 @@ const ProtectedRoute = ({ children }) => {
   }
 
   return children;
+};
+
+// Admin-only route component
+const AdminRoute = ({ children }) => {
+  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+  const isAdmin = userData.userType === 'Admin';
+  
+  if (!isAdmin) {
+    return <Navigate to="/home" replace />;
+  }
+  
+  return <ProtectedRoute>{children}</ProtectedRoute>;
 };
 
 // Layout Component with authentication check
@@ -65,7 +81,24 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Route - Login Page with authentication check */}
+    {/* Public Route - Login Page with more thorough authentication check */}
+<Route 
+  path="/" 
+  element={
+    (() => {
+      const isAuth = localStorage.getItem('isAuthenticated') === 'true';
+      const loginData = JSON.parse(localStorage.getItem('loginResponse') || '{}');
+      
+      // Only redirect if both conditions are true
+      if (isAuth && loginData?.output?.data) {
+        return <Navigate to="/home" replace />;
+      }
+      
+      // Otherwise show login page
+      return <LoginPage />;
+    })()
+  } 
+/>    {/* Public Route - Login Page with authentication check */}
         <Route 
           path="/" 
           element={
@@ -73,6 +106,18 @@ const App = () => {
             <Navigate to="/home" replace /> : 
             <LoginPage />
           } 
+        />
+
+        {/* Admin-only route for user approval */}
+        <Route
+          path="/user-approval"
+          element={
+            <AdminRoute>
+              <Layout>
+                <UserApprovalPage />
+              </Layout>
+            </AdminRoute>
+          }
         />
 
         {/* Protected Routes */}

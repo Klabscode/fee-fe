@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, FileText, Clock, Menu, X, User, LogOut } from 'lucide-react';
+import { Home, FileText, Clock, Menu, X, User, LogOut, UserCheck } from 'lucide-react';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -54,30 +54,34 @@ const Navbar = () => {
     });
   };
 
-  const handleLogout = async () => {
+  const handleLogout = (e) => {
+    // Prevent any event bubbling
+    e.preventDefault();
+    e.stopPropagation();
+    
     try {
-      // First set auth status to false
+      // Clear all localStorage first
+      localStorage.clear();
+      
+      // Then explicitly set authentication state to false
       localStorage.setItem('isAuthenticated', 'false');
       
-      // Reset all states first
+      // Reset component state
       setIsAdmin(false);
       setUserData({});
       setDropdownOpen(false);
       setMobileMenuOpen(false);
       
-      // Clear remaining localStorage items
-      localStorage.removeItem('loginResponse');
-      localStorage.removeItem('userData');
-      localStorage.clear();
-      
-      // Navigate last, after all cleanup is done
-      navigate('/', { replace: true });
-      
+      // Use a small timeout to ensure localStorage changes are complete 
+      // before navigation happens
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 50);
     } catch (error) {
       console.error('Logout error:', error);
-      // Ensure navigation happens even if there's an error
+      // Emergency fallback
       localStorage.clear();
-      navigate('/', { replace: true });
+      window.location.href = '/';
     }
   };
 
@@ -139,13 +143,23 @@ const Navbar = () => {
             </button>
 
             {isAdmin && (
-              <button
-                onClick={() => handleNavigation('/allocate')}
-                className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2"
-              >
-                <FileText className="h-5 w-5" />
-                <span>Allocation</span>
-              </button>
+              <>
+                <button
+                  onClick={() => handleNavigation('/allocate')}
+                  className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2"
+                >
+                  <FileText className="h-5 w-5" />
+                  <span>Allocation</span>
+                </button>
+
+                <button
+                  onClick={() => handleNavigation('/user-approval')}
+                  className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2"
+                >
+                  <UserCheck className="h-5 w-5" />
+                  <span>User Approval</span>
+                </button>
+              </>
             )}
 
             {/* Profile Dropdown */}
@@ -226,13 +240,23 @@ const Navbar = () => {
             </button>
 
             {isAdmin && (
-              <button
-                onClick={() => handleNavigation('/allocate')}
-                className="w-full text-left text-white hover:bg-blue-700 px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2"
-              >
-                <FileText className="h-5 w-5" />
-                <span>Allocation</span>
-              </button>
+              <>
+                <button
+                  onClick={() => handleNavigation('/allocate')}
+                  className="w-full text-left text-white hover:bg-blue-700 px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2"
+                >
+                  <FileText className="h-5 w-5" />
+                  <span>Allocation</span>
+                </button>
+                
+                <button
+                  onClick={() => handleNavigation('/user-approval')}
+                  className="w-full text-left text-white hover:bg-blue-700 px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2"
+                >
+                  <UserCheck className="h-5 w-5" />
+                  <span>User Approval</span>
+                </button>
+              </>
             )}
 
             {/* Mobile Profile Section */}

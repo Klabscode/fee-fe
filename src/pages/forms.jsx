@@ -180,7 +180,20 @@ const FormsPage = () => {
           <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
         </tr>
       );
+    } else if (userType === 'Section') {
+      // For Section users - limited information
+      return (
+        <tr>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">School ID</th>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Classes</th>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <th className="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      );
     }
+    // For other users (Admin, Entry)
     return (
       <tr>
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
@@ -192,9 +205,6 @@ const FormsPage = () => {
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Allocated To</th>
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-        {userType === 'Section' && (
-          <th className="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-        )}
       </tr>
     );
   };
@@ -235,8 +245,42 @@ const FormsPage = () => {
           </td>
         </tr>
       );
+    } else if (userType === 'Section') {
+      // Limited info for Section users
+      return (
+        <tr key={form.id} className="hover:bg-gray-50">
+          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{new Date(form.formDate).toLocaleDateString()}</td>
+          <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{form.feeformSchoolId || 'N/A'}</td>
+          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{formatClasses(form.classesFunctioning)}</td>
+          <td className="px-4 py-3 text-sm text-gray-600">
+            <div>{form.localityType || 'N/A'}</div>
+            <div className="text-xs text-gray-500 max-w-xs truncate" title={form.locality}>{truncateAddress(form.locality, 20)}</div>
+          </td>
+          <td className="px-4 py-3 whitespace-nowrap">
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              form.status === 'Completed' ? 'bg-green-100 text-green-800' : 
+              form.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 
+              form.status === 'Allocated' ? 'bg-blue-100 text-blue-800' :
+              'bg-gray-100 text-gray-800'
+            }`}>
+              {form.status || 'Unknown'}
+            </span>
+          </td>
+          <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+            {form.status && form.status.trim() === 'Completed' ? (
+              <span className="text-gray-400 px-3 py-1">Completed</span>
+            ) : (
+              <button onClick={() => handleEdit(form)} className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition-colors flex items-center">
+                <Eye className="h-4 w-4 mr-1" />
+                Edit
+              </button>
+            )}
+          </td>
+        </tr>
+      );
     }
     
+    // For other users
     return (
       <tr key={form.id} className="hover:bg-gray-50">
         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{new Date(form.formDate).toLocaleDateString()}</td>
@@ -271,18 +315,6 @@ const FormsPage = () => {
             {form.status || 'Unknown'}
           </span>
         </td>
-        {userType === 'Section' && (
-          <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-            {form.status && form.status.trim() === 'Completed' ? (
-              <span className="text-gray-400 px-3 py-1">Completed</span>
-            ) : (
-              <button onClick={() => handleEdit(form)} className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition-colors flex items-center">
-                <Eye className="h-4 w-4 mr-1" />
-                Edit
-              </button>
-            )}
-          </td>
-        )}
       </tr>
     );
   };
