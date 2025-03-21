@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 export const API_BASE_URL = {
-  apiUrlConfig: 'http://localhost:3000/api', // Set the base URL to your localhost
-  // apiUrlConfig: 'https://feecommittee.klabsindia.com/v1/api', // Set the base URL to your localhost
+  // apiUrlConfig: 'http://localhost:3000/api', // Set the base URL to your localhost
+  apiUrlConfig: 'https://feecommittee.klabsindia.com/v1/api', // Set the base URL to your localhost
 
 };
 

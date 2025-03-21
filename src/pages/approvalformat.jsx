@@ -76,6 +76,17 @@ const ApprovalFormat = () => {
         headers
       });
   
+      // Fetch fee data
+      const feeResponse = await api.get('/getAllocatedFormByFeeForm', {
+        params: { feeformId: feeFormId, allocatedTo: allocatedTo },
+        headers
+      });
+      
+      let feeData = {};
+      if (feeResponse.data?.results) {
+        feeData = feeResponse.data.results;
+      }
+  
       if (strengthResponse.data?.results) {
         const schoolData = strengthResponse.data.results;
         setSchoolDetails({
@@ -83,18 +94,18 @@ const ApprovalFormat = () => {
           name: schoolData.schoolName || '',
           address: schoolData.address || ''
         });
-      }
-  
-      // Fetch fee data
-      const feeResponse = await api.get('/getAllocatedFormByFeeForm', {
-        params: { feeformId: feeFormId, allocatedTo: allocatedTo },
-        headers
-      });
-  
-      if (strengthResponse.data?.results?.studentStrengthIndividual && feeResponse.data?.results) {
-        const strengthData = strengthResponse.data.results.studentStrengthIndividual;
-        const feeData = feeResponse.data.results;
         
+        // Parse the JSON string for student strength data
+        let strengthData = {};
+        if (schoolData.studentStrengthIndividual) {
+          try {
+            strengthData = JSON.parse(schoolData.studentStrengthIndividual);
+          } catch (error) {
+            console.error('Error parsing studentStrengthIndividual:', error);
+          }
+        }
+        
+        // Update the feeStructure2024 with the parsed strength data
         setFeeStructure2024({
           'LKG': { 
             strength: strengthData.lkg?.toString() || '', 

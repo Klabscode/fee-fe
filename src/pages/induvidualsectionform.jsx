@@ -64,26 +64,40 @@ const IndividualSectionForm = () => {
 
         // Set basic form data
      // Inside fetchFormData function, within the if (formResponse.data?.results) block
-if (formResponse.data?.results) {
-  const formData = formResponse.data.results;
-  setForm(prev => ({
-    ...prev,
-    schoolName: formData.schoolName || '',
-    address: formData.address || '',
-    schoolId: formData.feeformSchoolId || '',
-    email: formData.email || ''
-  }));
+     if (formResponse.data?.results) {
+      const formData = formResponse.data.results;
+      setForm(prev => ({
+        ...prev,
+        schoolName: formData.schoolName || '',
+        address: formData.address || '',
+        schoolId: formData.feeformSchoolId || '',
+        email: formData.email || ''
+      }));
 
   // Store locality type in localStorage
   localStorage.setItem('localityType', formData.localityType || '');
 
   // Store total student strength in localStorage
-  if (formData.studentStrengthIndividual?.total) {
-    localStorage.setItem('totalStudentStrength', formData.studentStrengthIndividual.total.toString());
-    setTotalStrength(formData.studentStrengthIndividual.total);
+  if (formData.studentStrengthIndividual) {
+    try {
+      // Parse the JSON string to an object
+      const studentStrength = typeof formData.studentStrengthIndividual === 'string' 
+        ? JSON.parse(formData.studentStrengthIndividual) 
+        : formData.studentStrengthIndividual;
+      
+      // Now access the total property
+      if (studentStrength && studentStrength.total !== undefined) {
+        localStorage.setItem('totalStudentStrength', studentStrength.total.toString());
+        setTotalStrength(studentStrength.total);
+      }
+    } catch (error) {
+      console.error('Error parsing student strength:', error);
+      // Fallback to 0 if parsing fails
+      localStorage.setItem('totalStudentStrength', '0');
+      setTotalStrength(0);
+    }
   }
-}
-        // Set previously filled data if exists
+}      // Set previously filled data if exists
         if (allocatedFormResponse.data?.results) {
           const allocatedData = allocatedFormResponse.data.results;
           setForm(prev => ({

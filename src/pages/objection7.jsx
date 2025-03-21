@@ -4,6 +4,7 @@ import api from '../api/api';
 const AccountSevenFormat = () => {
   const [formData, setFormData] = useState(null);
   const [strengthData, setStrengthData] = useState(null);
+  const [parsedStrengthData, setParsedStrengthData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,6 +34,19 @@ const AccountSevenFormat = () => {
 
         if (strengthResponse.data.status === 200) {
           setStrengthData(strengthResponse.data.results);
+          
+          // Parse student strength data
+          try {
+            const rawStrengthData = strengthResponse.data.results.studentStrengthIndividual;
+            const parsedData = typeof rawStrengthData === 'string' 
+              ? JSON.parse(rawStrengthData) 
+              : rawStrengthData;
+            
+            setParsedStrengthData(parsedData);
+          } catch (error) {
+            console.error('Error parsing student strength data:', error);
+            setParsedStrengthData({});
+          }
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -87,7 +101,7 @@ const AccountSevenFormat = () => {
                       <div className="break-words">{item.class}</div>
                     </td>
                     <td className={numberCellClasses}>
-                      {strengthData?.studentStrengthIndividual?.[item.strength] || 0}
+                      {parsedStrengthData?.[item.strength] || 0}
                     </td>
                     <td className={numberCellClasses}>
                       {formData?.[item.currentFee] || 0}

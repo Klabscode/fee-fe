@@ -99,39 +99,50 @@ const Account7Form = () => {
         'Content-Type': 'application/json'
       };
   
-      const response = await api.get(`/getFeeFormByFeeformId`, {
-        params: { feeformId: feeFormId },
+      const response = await api.get(`/getFormById`, {
+        params: { id: feeFormId },
         headers
       });
   
       if (response.data?.results) {
-        const data = response.data.results;
+        const formData = response.data.results;
         
-        setForm(prevForm => ({
-          ...prevForm,
-          studentStrength: {
-            "LKG": { ...prevForm.studentStrength.LKG, strength: data.lkgStrength?.toString() || '' },
-            "UKG": { ...prevForm.studentStrength.UKG, strength: data.ukgStrength?.toString() || '' },
-            "I": { ...prevForm.studentStrength.I, strength: data.firstStrength?.toString() || '' },
-            "II": { ...prevForm.studentStrength.II, strength: data.secondStrength?.toString() || '' },
-            "III": { ...prevForm.studentStrength.III, strength: data.thirdStrength?.toString() || '' },
-            "IV": { ...prevForm.studentStrength.IV, strength: data.fourthStrength?.toString() || '' },
-            "V": { ...prevForm.studentStrength.V, strength: data.fifthStrength?.toString() || '' },
-            "VI": { ...prevForm.studentStrength.VI, strength: data.sixthStrength?.toString() || '' },
-            "VII": { ...prevForm.studentStrength.VII, strength: data.seventhStrength?.toString() || '' },
-            "VIII": { ...prevForm.studentStrength.VIII, strength: data.eighthStrength?.toString() || '' },
-            "IX": { ...prevForm.studentStrength.IX, strength: data.ninthStrength?.toString() || '' },
-            "X": { ...prevForm.studentStrength.X, strength: data.tenthStrength?.toString() || '' },
-            "XI": { ...prevForm.studentStrength.XI, strength: data.eleventhStrength?.toString() || '' },
-            "XII": { ...prevForm.studentStrength.XII, strength: data.twelfthStrength?.toString() || '' }
-          }
-        }));
+        // Parse the studentStrengthIndividual JSON string
+        let studentStrength = {};
+        try {
+          // Check if we need to parse the string or if it's already an object
+          const strengthData = typeof formData.studentStrengthIndividual === 'string' 
+            ? JSON.parse(formData.studentStrengthIndividual) 
+            : formData.studentStrengthIndividual;
+          
+          // Update the form with the parsed student strength data
+          setForm(prevForm => ({
+            ...prevForm,
+            studentStrength: {
+              "LKG": { ...prevForm.studentStrength.LKG, strength: strengthData.lkg?.toString() || '' },
+              "UKG": { ...prevForm.studentStrength.UKG, strength: strengthData.ukg?.toString() || '' },
+              "I": { ...prevForm.studentStrength.I, strength: strengthData.one?.toString() || '' },
+              "II": { ...prevForm.studentStrength.II, strength: strengthData.two?.toString() || '' },
+              "III": { ...prevForm.studentStrength.III, strength: strengthData.three?.toString() || '' },
+              "IV": { ...prevForm.studentStrength.IV, strength: strengthData.four?.toString() || '' },
+              "V": { ...prevForm.studentStrength.V, strength: strengthData.five?.toString() || '' },
+              "VI": { ...prevForm.studentStrength.VI, strength: strengthData.six?.toString() || '' },
+              "VII": { ...prevForm.studentStrength.VII, strength: strengthData.seven?.toString() || '' },
+              "VIII": { ...prevForm.studentStrength.VIII, strength: strengthData.eight?.toString() || '' },
+              "IX": { ...prevForm.studentStrength.IX, strength: strengthData.nine?.toString() || '' },
+              "X": { ...prevForm.studentStrength.X, strength: strengthData.ten?.toString() || '' },
+              "XI": { ...prevForm.studentStrength.XI, strength: strengthData.eleven?.toString() || '' },
+              "XII": { ...prevForm.studentStrength.XII, strength: strengthData.twelve?.toString() || '' }
+            }
+          }));
+        } catch (error) {
+          console.error('Error parsing student strength:', error);
+        }
       }
     } catch (error) {
       console.error('Error fetching student strength:', error);
     }
   };
-  
   const [totals, setTotals] = useState({
     totalStudents: 0,
     totalIncome: 0,
@@ -155,67 +166,82 @@ const Account7Form = () => {
     
         if (prevFeesResponse.data?.results) {
           const prevData = prevFeesResponse.data.results;
-          setForm(prev => ({
-            ...prev,
-            previousFees: {
-              "LKG": { 
-                proposed: prevData.proposedFeeIndividual?.lkg || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.lkg || ''
-              },
-              "UKG": { 
-                proposed: prevData.proposedFeeIndividual?.ukg || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.ukg || ''
-              },
-              "I": { 
-                proposed: prevData.proposedFeeIndividual?.one || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.one || ''
-              },
-              "II": { 
-                proposed: prevData.proposedFeeIndividual?.two || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.two || ''
-              },
-              "III": { 
-                proposed: prevData.proposedFeeIndividual?.three || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.three || ''
-              },
-              "IV": { 
-                proposed: prevData.proposedFeeIndividual?.four || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.four || ''
-              },
-              "V": { 
-                proposed: prevData.proposedFeeIndividual?.five || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.five || ''
-              },
-              "VI": { 
-                proposed: prevData.proposedFeeIndividual?.six || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.six || ''
-              },
-              "VII": { 
-                proposed: prevData.proposedFeeIndividual?.seven || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.seven || ''
-              },
-              "VIII": { 
-                proposed: prevData.proposedFeeIndividual?.eight || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.eight || ''
-              },
-              "IX": { 
-                proposed: prevData.proposedFeeIndividual?.nine || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.nine || ''
-              },
-              "X": { 
-                proposed: prevData.proposedFeeIndividual?.ten || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.ten || ''
-              },
-              "XI": { 
-                proposed: prevData.proposedFeeIndividual?.eleven || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.eleven || ''
-              },
-              "XII": { 
-                proposed: prevData.proposedFeeIndividual?.twelve || '',
-                previous: prevData.previousFeeCommitteeOrderFeeIndividual?.twelve || ''
+          
+          // Parse previous fee data properly
+          try {
+            // Parse proposedFeeIndividual and previousFeeCommitteeOrderFeeIndividual
+            const proposedFeeIndividual = typeof prevData.proposedFeeIndividual === 'string'
+              ? JSON.parse(prevData.proposedFeeIndividual)
+              : prevData.proposedFeeIndividual || {};
+              
+            const previousFeeCommitteeOrderFeeIndividual = typeof prevData.previousFeeCommitteeOrderFeeIndividual === 'string'
+              ? JSON.parse(prevData.previousFeeCommitteeOrderFeeIndividual)
+              : prevData.previousFeeCommitteeOrderFeeIndividual || {};
+            
+            setForm(prev => ({
+              ...prev,
+              previousFees: {
+                "LKG": { 
+                  proposed: proposedFeeIndividual.lkg?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.lkg?.toString() || ''
+                },
+                "UKG": { 
+                  proposed: proposedFeeIndividual.ukg?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.ukg?.toString() || ''
+                },
+                "I": { 
+                  proposed: proposedFeeIndividual.one?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.one?.toString() || ''
+                },
+                "II": { 
+                  proposed: proposedFeeIndividual.two?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.two?.toString() || ''
+                },
+                "III": { 
+                  proposed: proposedFeeIndividual.three?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.three?.toString() || ''
+                },
+                "IV": { 
+                  proposed: proposedFeeIndividual.four?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.four?.toString() || ''
+                },
+                "V": { 
+                  proposed: proposedFeeIndividual.five?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.five?.toString() || ''
+                },
+                "VI": { 
+                  proposed: proposedFeeIndividual.six?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.six?.toString() || ''
+                },
+                "VII": { 
+                  proposed: proposedFeeIndividual.seven?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.seven?.toString() || ''
+                },
+                "VIII": { 
+                  proposed: proposedFeeIndividual.eight?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.eight?.toString() || ''
+                },
+                "IX": { 
+                  proposed: proposedFeeIndividual.nine?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.nine?.toString() || ''
+                },
+                "X": { 
+                  proposed: proposedFeeIndividual.ten?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.ten?.toString() || ''
+                },
+                "XI": { 
+                  proposed: proposedFeeIndividual.eleven?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.eleven?.toString() || ''
+                },
+                "XII": { 
+                  proposed: proposedFeeIndividual.twelve?.toString() || '',
+                  previous: previousFeeCommitteeOrderFeeIndividual.twelve?.toString() || ''
+                }
               }
-            }
-          }));
+            }));
+          } catch (error) {
+            console.error('Error parsing previous fee data:', error);
+          }
         }
     
         // Fetch student strength data
@@ -226,23 +252,40 @@ const Account7Form = () => {
     
         let studentStrengthData = {};
         if (strengthResponse.data?.results) {
-          const strengthData = strengthResponse.data.results.studentStrengthIndividual;
-          studentStrengthData = {
-            "LKG": { strength: strengthData.lkg?.toString() || '' },
-            "UKG": { strength: strengthData.ukg?.toString() || '' },
-            "I": { strength: strengthData.one?.toString() || '' },
-            "II": { strength: strengthData.two?.toString() || '' },
-            "III": { strength: strengthData.three?.toString() || '' },
-            "IV": { strength: strengthData.four?.toString() || '' },
-            "V": { strength: strengthData.five?.toString() || '' },
-            "VI": { strength: strengthData.six?.toString() || '' },
-            "VII": { strength: strengthData.seven?.toString() || '' },
-            "VIII": { strength: strengthData.eight?.toString() || '' },
-            "IX": { strength: strengthData.nine?.toString() || '' },
-            "X": { strength: strengthData.ten?.toString() || '' },
-            "XI": { strength: strengthData.eleven?.toString() || '' },
-            "XII": { strength: strengthData.twelve?.toString() || '' }
-          };
+          try {
+            const data = strengthResponse.data.results;
+            const strengthData = typeof data.studentStrengthIndividual === 'string'
+              ? JSON.parse(data.studentStrengthIndividual)
+              : data.studentStrengthIndividual;
+              
+            studentStrengthData = {
+              "LKG": { strength: strengthData.lkg?.toString() || '' },
+              "UKG": { strength: strengthData.ukg?.toString() || '' },
+              "I": { strength: strengthData.one?.toString() || '' },
+              "II": { strength: strengthData.two?.toString() || '' },
+              "III": { strength: strengthData.three?.toString() || '' },
+              "IV": { strength: strengthData.four?.toString() || '' },
+              "V": { strength: strengthData.five?.toString() || '' },
+              "VI": { strength: strengthData.six?.toString() || '' },
+              "VII": { strength: strengthData.seven?.toString() || '' },
+              "VIII": { strength: strengthData.eight?.toString() || '' },
+              "IX": { strength: strengthData.nine?.toString() || '' },
+              "X": { strength: strengthData.ten?.toString() || '' },
+              "XI": { strength: strengthData.eleven?.toString() || '' },
+              "XII": { strength: strengthData.twelve?.toString() || '' }
+            };
+          } catch (error) {
+            console.error('Error parsing student strength data:', error);
+            studentStrengthData = {
+              "LKG": { strength: '' }, "UKG": { strength: '' },
+              "I": { strength: '' }, "II": { strength: '' },
+              "III": { strength: '' }, "IV": { strength: '' },
+              "V": { strength: '' }, "VI": { strength: '' },
+              "VII": { strength: '' }, "VIII": { strength: '' },
+              "IX": { strength: '' }, "X": { strength: '' },
+              "XI": { strength: '' }, "XII": { strength: '' }
+            };
+          }
         }
     
         // Fetch allocated form data
@@ -667,21 +710,24 @@ const Account7Form = () => {
         headers: response.headers
       });
   
-      if (response.status === 200) {
-        alert("Success");
-        
-        // Navigate based on the calculated status
-        if (totals.difference >= 0) {
-          navigate('/approve');
-        } else {
-          navigate('/objection');
-        }
-      } else {
-        throw new Error(
-          response.data?.message || 
-          `API Error: ${response.status} ${response.statusText}`
-        );
-      }
+// Update this part in your handleSubmit function
+if (response.status === 200) {
+  alert("Success");
+  
+  // Only navigate if difference exists
+  if (totals.difference !== '') {
+    if (totals.difference >= 0) {
+      navigate('/approve');
+    } else {
+      navigate('/objection');
+    }
+  }
+} else {
+  throw new Error(
+    response.data?.message || 
+    `API Error: ${response.status} ${response.statusText}`
+  );
+}
     } catch (error) {
       console.error('Form Submission Error:', {
         message: error.message,
@@ -741,7 +787,7 @@ if (initialLoading) {
                 <tr className="bg-gray-50">
                   <th className="border border-gray-300 px-4 py-2">Class</th>
                   <th className="border border-gray-300 px-4 py-2">Student's strength</th>
-                  <th className="border border-gray-300 px-4 py-2">2024-25 Fee Rs.</th>
+                  <th className="border border-gray-300 px-4 py-2">2025-26 Fee Rs.</th>
                   <th className="border border-gray-300 px-4 py-2">Income</th>
                 </tr>
               </thead>
@@ -749,14 +795,9 @@ if (initialLoading) {
                 {Object.entries(form.studentStrength).map(([className, values]) => (
                   <tr key={className}>
                     <td className="border border-gray-300 px-4 py-2">{className}</td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      <input
-                        type="number"
-                        value={values.strength}
-                        onChange={(e) => handleStrengthChange(className, e.target.value)}
-                        className="w-full p-1 text-center"
-                      />
-                    </td>
+                    <td className="border border-gray-300 px-4 py-2 text-center">
+  {values.strength}
+</td>
                     <td className="border border-gray-300 px-4 py-2">
                       <input
                         type="number"
@@ -798,8 +839,8 @@ if (initialLoading) {
   <thead>
     <tr className="bg-gray-50">
       <th className="border border-gray-300 px-4 py-2">Class</th>
-      <th className="border border-gray-300 px-4 py-2">2025-26 Fee (Rs.)</th>
       <th className="border border-gray-300 px-4 py-2">2026-27 Fee (Rs.)</th>
+      <th className="border border-gray-300 px-4 py-2">2027-28 Fee (Rs.)</th>
     </tr>
   </thead>
   <tbody>
@@ -844,7 +885,7 @@ if (initialLoading) {
 </table>
 {/* Add the new Attended By section here */}
 
-<div className="mb-6 w-1/2"> {/* Changed from w-full to w-1/2 */}
+<div className="mb-6 w-1/2">
   <label htmlFor="attendedBy" className="block text-sm font-medium text-gray-700 mb-2">
     Attended By *
   </label>
@@ -853,10 +894,13 @@ if (initialLoading) {
     id="attendedBy"
     value={attendedBy}
     onChange={(e) => setAttendedBy(e.target.value)}
-    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+    className={`w-full p-2 border ${!attendedBy ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-blue-500 focus:border-blue-500`}
     placeholder="Enter your name"
     required
   />
+  {!attendedBy && (
+    <p className="mt-1 text-sm text-red-600">This field is required</p>
+  )}
 </div>
             <div className="flex justify-end space-x-3">
               <button
@@ -867,12 +911,12 @@ if (initialLoading) {
                 Back
               </button>
               <button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400"
-              >
-                {loading ? 'Saving...' : 'Submit'}
-              </button>
+  onClick={handleSubmit}
+  disabled={loading || !attendedBy}
+  className={`px-4 py-2 ${!attendedBy ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-md disabled:bg-blue-400`}
+>
+  {loading ? 'Saving...' : 'Submit'}
+</button>
             </div>
           </div>
         </div>
