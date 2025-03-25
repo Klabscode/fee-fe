@@ -263,7 +263,7 @@ const ApprovalFormat = () => {
         </div>
    
         <div style="margin-bottom: 30px;">
-          <h3 style="margin-bottom: 15px; font-size: 16px;">Fee structure for 2024-25 (Approval)</h3>
+          <h3 style="margin-bottom: 15px; font-size: 16px;">Fee structure for 2025-26 (Approval)</h3>
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr style="background-color: #f3f4f6;">
               <th style="border: 1px solid #000; padding: 8px; text-align: center;">Class</th>
@@ -462,7 +462,7 @@ const ApprovalFormat = () => {
 
               {/* Fee Tables */}
               <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4">Fee structure for 2024-25 (Approval)</h3>
+                <h3 className="text-lg font-semibold mb-4">Fee structure for 2025-26 (Approval)</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse border border-gray-300 mb-8">
                     <thead>

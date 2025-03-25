@@ -147,7 +147,7 @@ const downloadPDF = async () => {
               <div className="section-break">
                 <div className="flex justify-between items-start mb-4 no-break">
                   <p className="text-sm">School Code: {schoolDetails.code}</p>
-                  <p className="text-sm">2024-2027 FORMAT</p>
+                  <p className="text-sm">2025-2026 FORMAT</p>
                 </div>
                 
                 <div className="mb-6 no-break">

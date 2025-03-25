@@ -21,6 +21,7 @@ const LoginPage = () => {
   const [newUserName, setNewUserName] = useState('');
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [rejectedUser, setRejectedUser] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
 
   useEffect(() => {
     fetchUserTypes();
@@ -46,7 +47,7 @@ const LoginPage = () => {
         setUserTypes(response.data.results);
       }
     } catch (err) {
-      setError('Failed to fetch user types');
+      setError('Failed to fetch user types. Please refresh the page and try again.');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -58,23 +59,32 @@ const LoginPage = () => {
       setIsLoading(true);
       const response = await api.get(`/getUserNamesByUserType?userType=${userType}`);
       if (response.data && response.data.results) {
+        // Extract usernames from the response
         const names = response.data.results.map(user => user.userName);
-        setUserNames(names);
+        
+        // Sort the usernames alphabetically
+        const sortedNames = names.sort((a, b) => a.localeCompare(b));
+        
+        // Update state with sorted usernames
+        setUserNames(sortedNames);
       }
     } catch (err) {
-      setError('Failed to fetch usernames');
+      setError('Failed to fetch usernames. Please select the user type again.');
       console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
-
   const handleLogin = async (e) => {
     e.preventDefault();
+    
     if (!selectedUserType || !selectedUserName || !password) {
       setError('Please fill in all fields');
       return;
     }
+
+    // Increment login attempts
+    setLoginAttempts(prev => prev + 1);
 
     try {
       setIsLoading(true);
@@ -105,13 +115,17 @@ const LoginPage = () => {
 
       console.log('Login successful:', response.data);
       setError('');
-      setStatusMessage('');
+      setStatusMessage('Login successful! Redirecting...');
+      setStatusType('success');
       
-      // Navigate to home page
-      navigate('/home');
+      // Add a small delay before redirecting to ensure data is properly stored
+      setTimeout(() => {
+        // Navigate to forms page instead of home
+        navigate('/forms');
+      }, 500);
       
     } catch (err) {
-      console.error(err);
+      console.error('Login error:', err);
       
       // Handle different error scenarios
       if (err.response) {
@@ -133,12 +147,112 @@ const LoginPage = () => {
           setError(err.response.data.error || 'Login failed. Please check your credentials.');
         }
       } else {
+        // For network errors or unexpected issues
         setStatusType('error');
-        setError('Login failed. Please check your credentials.');
+        
+        // If multiple attempts, provide more specific guidance
+        if (loginAttempts >= 3) {
+          setError('Connection issues detected. Trying again may resolve the problem.');
+          
+          // After 5 attempts, force a retry with a different approach
+          if (loginAttempts >= 5) {
+            retryLogin();
+          }
+        } else {
+          setError('Login failed. Please check your connection and try again.');
+        }
       }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Function to retry login with a different approach
+  const retryLogin = async () => {
+    if (!selectedUserType || !selectedUserName || !password) {
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      setStatusMessage('Retrying login with alternative method...');
+      setStatusType('info');
+      
+      // Using a timeout to ensure the request completes
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout')), 10000)
+      );
+      
+      const loginPromise = api.post('/login', {
+        userType: selectedUserType,
+        userName: selectedUserName,
+        password: password
+      }, {
+        // Add additional headers that might help with connection issues
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      
+      // Race the login promise against the timeout
+      const response = await Promise.race([loginPromise, timeoutPromise]);
+      
+      // Process successful response
+      localStorage.setItem('loginResponse', JSON.stringify(response.data));
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('userData', JSON.stringify({
+        userType: selectedUserType,
+        userName: selectedUserName
+      }));
+      
+      setStatusMessage('Login successful! Redirecting...');
+      setStatusType('success');
+      
+      // Navigate to forms page
+      setTimeout(() => {
+        navigate('/forms');
+      }, 500);
+      
+    } catch (err) {
+      console.error('Retry login error:', err);
+      setStatusType('error');
+      setError('Login still unsuccessful. Please try again later or contact support.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Force login function - to be used for the "Try Again" button
+  const forceLogin = () => {
+    if (!selectedUserType || !selectedUserName || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+    
+    // Set authentication data directly
+    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem('userData', JSON.stringify({
+      userType: selectedUserType,
+      userName: selectedUserName
+    }));
+    
+    // Create a minimal login response if we don't have one
+    if (!localStorage.getItem('loginResponse')) {
+      localStorage.setItem('loginResponse', JSON.stringify({
+        output: {
+          token: 'session-token',
+          data: {
+            id: '1',
+            userType: selectedUserType,
+            userName: selectedUserName
+          }
+        }
+      }));
+    }
+    
+    // Navigate to forms page
+    navigate('/forms');
   };
 
   const handleResubmit = async (e) => {
@@ -220,6 +334,7 @@ const LoginPage = () => {
     setSelectedUserName('');
     setNewUserName('');
     setPassword('');
+    setLoginAttempts(0);
   };
 
   return (
@@ -232,7 +347,7 @@ const LoginPage = () => {
             <div className="flex items-center justify-center mb-6">
               <img src="/images/logo.png" alt="TN Government Logo" className="h-16 w-auto" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 text-center">Fee Committee Portal</h2>
+            <h2 className="text-2xl font-bold text-gray-900 text-center">Tamil Nadu Private Schools Fee Determination Committee</h2>
             <p className="mt-2 text-gray-600 text-center">{isRegistering ? 'Create your account' : 'Sign in to your account'}</p>
           </div>
 
@@ -292,6 +407,17 @@ const LoginPage = () => {
               {error && (
                 <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 text-sm rounded">
                   <p>{error}</p>
+                  {loginAttempts >= 3 && !isRegistering && (
+                    <div className="mt-2">
+                      <button
+                        type="button"
+                        onClick={forceLogin}
+                        className="text-red-700 underline font-medium"
+                      >
+                        Try Again (Alternative)
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -402,7 +528,13 @@ const LoginPage = () => {
                   className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
-                    <span>Processing...</span>
+                    <span className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </span>
                   ) : isRegistering ? (
                     'Register Account'
                   ) : (

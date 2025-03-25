@@ -2,11 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Filter, Search, Calendar, ChevronDown, RefreshCw } from 'lucide-react';
 import api from '../api/api';
 
-const CascadingFilters = ({ onApplyFilters, isFormsLoading }) => {
+const CascadingFilters = ({ onApplyFilters, isFormsLoading, data = [] }) => {
   const [districts, setDistricts] = useState([]);
   const [schoolTypes, setSchoolTypes] = useState([]);
   const [filtersLoading, setFiltersLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     districtId: '',
     schoolCategory: '',
@@ -100,6 +101,11 @@ const CascadingFilters = ({ onApplyFilters, isFormsLoading }) => {
     }));
   };
 
+  // Handle global search
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
   // Handle filter form submission
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -115,10 +121,33 @@ const CascadingFilters = ({ onApplyFilters, isFormsLoading }) => {
     }, {});
     
     console.log('Applying filters:', cleanFilters);
-    onApplyFilters(cleanFilters);
     
-    // The forms loading state is now managed by the parent component
-    // No need to set local loading state
+    // Apply frontend search filtering along with other filters
+    if (searchQuery.trim() !== '') {
+      // This will be used by the parent component to filter the data
+      const lowercaseQuery = searchQuery.toLowerCase();
+      
+      // Create a search function that the parent component can use
+      const searchFunction = (item) => {
+        // Convert all searchable fields to lowercase strings for case-insensitive search
+        const searchableFields = [
+          item.schoolName,
+          item.schoolCode,
+          item.district,
+          item.schoolType,
+          item.address,
+          // Add any other fields you want to include in the search
+        ].filter(Boolean).map(field => String(field).toLowerCase());
+        
+        // Check if any field contains the search query
+        return searchableFields.some(field => field.includes(lowercaseQuery));
+      };
+      
+      // Include the search function in the filters
+      cleanFilters.searchFunction = searchFunction;
+    }
+    
+    onApplyFilters(cleanFilters);
   };
 
   // Reset all filters
@@ -131,6 +160,7 @@ const CascadingFilters = ({ onApplyFilters, isFormsLoading }) => {
       toDate: '',
       status: ''
     });
+    setSearchQuery('');
     onApplyFilters({});
   };
 
@@ -189,6 +219,36 @@ const CascadingFilters = ({ onApplyFilters, isFormsLoading }) => {
           <form onSubmit={handleSubmit}>
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="flex flex-wrap gap-4 flex-1">
+                {/* Global Search - Frontend implementation */}
+                <div className="w-full sm:w-auto flex-1 min-w-[200px]">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <Search className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      placeholder="Search schools, codes, districts..."
+                      className="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      disabled={isFormsLoading || submitting}
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"
+                        onClick={() => setSearchQuery('')}
+                        disabled={isFormsLoading || submitting}
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 {/* District Filter */}
                 <div className="w-full sm:w-auto flex-1 min-w-[180px]">
                   <label className="block text-sm font-medium text-gray-700 mb-1">District</label>
@@ -242,40 +302,6 @@ const CascadingFilters = ({ onApplyFilters, isFormsLoading }) => {
                   </div>
                   {schoolTypes.length === 0 && <p className="text-xs text-red-500 mt-1">No school types available</p>}
                 </div>
-                
-                {/* From Date Filter - Kept commented out as requested */}
-                {/* <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <Calendar className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <input 
-                      type="date" 
-                      value={filters.fromDate} 
-                      onChange={(e) => handleFilterChange('fromDate', e.target.value)} 
-                      className="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      disabled={isFormsLoading || submitting}
-                    />
-                  </div>
-                </div> */}
-                
-                {/* To Date Filter - Kept commented out as requested */}
-                {/* <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">To Date</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <Calendar className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <input 
-                      type="date" 
-                      value={filters.toDate} 
-                      onChange={(e) => handleFilterChange('toDate', e.target.value)} 
-                      className="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      disabled={isFormsLoading || submitting}
-                    />
-                  </div>
-                </div> */}
                 
                 {/* Status Filter */}
                 <div className="w-full sm:w-auto flex-1 min-w-[180px]">

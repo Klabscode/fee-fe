@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, FileText, Clock, Menu, X, User, LogOut, UserCheck } from 'lucide-react';
+import { FileText, Clock, Menu, X, User, LogOut, UserCheck } from 'lucide-react';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -10,6 +10,7 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userData, setUserData] = useState({});
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     // Check authentication status on mount and route changes
@@ -25,7 +26,7 @@ const Navbar = () => {
         return;
       }
       
-      setIsAdmin(loginResponse?.output?.data?.userType === 'Admin');
+      setIsAdmin(userDataFromStorage?.userType === 'Admin');
       setUserData(userDataFromStorage);
     };
 
@@ -54,32 +55,25 @@ const Navbar = () => {
     });
   };
 
+  // Simplified, direct logout function that avoids complex DOM manipulations
   const handleLogout = (e) => {
-    // Prevent any event bubbling
     e.preventDefault();
-    e.stopPropagation();
+    
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    
+    // Close menus immediately to avoid visual glitches
+    setDropdownOpen(false);
+    setMobileMenuOpen(false);
     
     try {
-      // Clear all localStorage first
+      // Clear all storage data in one go
       localStorage.clear();
       
-      // Then explicitly set authentication state to false
-      localStorage.setItem('isAuthenticated', 'false');
-      
-      // Reset component state
-      setIsAdmin(false);
-      setUserData({});
-      setDropdownOpen(false);
-      setMobileMenuOpen(false);
-      
-      // Use a small timeout to ensure localStorage changes are complete 
-      // before navigation happens
-      setTimeout(() => {
-        navigate('/', { replace: true });
-      }, 50);
+      // Simple direct navigation - no delays, masks, or multiple steps
+      window.location.href = '/';
     } catch (error) {
       console.error('Logout error:', error);
-      // Emergency fallback
       localStorage.clear();
       window.location.href = '/';
     }
@@ -95,9 +89,10 @@ const Navbar = () => {
       return;
     }
     
-    navigate(path);
+    // Close menus
     setMobileMenuOpen(false);
     setDropdownOpen(false);
+    navigate(path);
   };
 
   return (
@@ -107,15 +102,7 @@ const Navbar = () => {
       {/* Main Navbar */}
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo and Title */}
-          <div className="flex-shrink-0">
-            <div className="flex flex-col">
-              <h1 className="text-xl font-bold text-white">Tamil Nadu Government</h1>
-              <span className="text-xs text-blue-100">Fee Committee</span>
-            </div>
-          </div>
-
-          {/* Desktop Clock */}
+          {/* Left Section - Clock */}
           <div className="hidden lg:flex flex-col items-center bg-blue-800/30 px-4 py-1 rounded-lg">
             <div className="flex items-center space-x-3 text-blue-100">
               <Clock className="h-5 w-5" />
@@ -124,24 +111,32 @@ const Navbar = () => {
             <span className="text-lg font-semibold text-white">{formatTime(currentTime)}</span>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:space-x-4">
-            <button
-              onClick={() => handleNavigation('/home')}
-              className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2"
-            >
-              <Home className="h-5 w-5" />
-              <span>Home</span>
-            </button>
-            
-            <button
-              onClick={() => handleNavigation('/forms')}
-              className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2"
-            >
-              <FileText className="h-5 w-5" />
-              <span>Forms</span>
-            </button>
+          {/* Center Section - Logo and Title */}
+          <div className="flex items-center justify-center flex-grow">
+            <div className="flex items-center">
+              {/* Logo and Title - clickable to navigate to /forms */}
+              <div 
+                className="flex items-center cursor-pointer" 
+                onClick={() => handleNavigation('/forms')}
+              >
+                {/* Logo from public directory */}
+                <div className="flex-shrink-0 mr-3">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                    <img src="images/logo.png" alt="TN Fee Committee Logo" className="w-10 h-10 object-contain" />
+                  </div>
+                </div>
+                
+                {/* Title */}
+                <div className="flex flex-col">
+                  <h1 className="text-xl font-bold text-white">Tamil Nadu Private Schools</h1>
+                  <span className="text-xs text-blue-100">Fee Determination Committee</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
+          {/* Right Section - Navigation */}
+          <div className="hidden md:flex md:items-center md:space-x-4">            
             {isAdmin && (
               <>
                 <button
@@ -181,10 +176,11 @@ const Navbar = () => {
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                   <button
                     onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    disabled={isLoggingOut}
+                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
-                    Logout
+                    {isLoggingOut ? 'Logging out...' : 'Logout'}
                   </button>
                 </div>
               )}
@@ -223,22 +219,6 @@ const Navbar = () => {
             </div>
 
             {/* Mobile Navigation Links */}
-            <button
-              onClick={() => handleNavigation('/home')}
-              className="w-full text-left text-white hover:bg-blue-700 px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2"
-            >
-              <Home className="h-5 w-5" />
-              <span>Home</span>
-            </button>
-
-            <button
-              onClick={() => handleNavigation('/forms')}
-              className="w-full text-left text-white hover:bg-blue-700 px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2"
-            >
-              <FileText className="h-5 w-5" />
-              <span>Forms</span>
-            </button>
-
             {isAdmin && (
               <>
                 <button
@@ -270,12 +250,22 @@ const Navbar = () => {
                   <p className="text-sm text-blue-200">{userData.userType || 'Role'}</p>
                 </div>
               </div>
+              
+              {/* Mobile Forms Navigation */}
               <button
-                onClick={handleLogout}
+                onClick={() => handleNavigation('/forms')}
                 className="w-full text-left text-white hover:bg-blue-700 px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2"
               >
+                <FileText className="h-5 w-5" />
+                <span>Forms</span>
+              </button>
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="w-full text-left text-white hover:bg-blue-700 px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2 disabled:opacity-50"
+              >
                 <LogOut className="h-5 w-5" />
-                <span>Logout</span>
+                <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
               </button>
             </div>
           </div>

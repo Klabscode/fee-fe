@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import LoginPage from './pages/login';
-import HomePage from './pages/homepage';
 import Navbar from './components/navbar';
 import FormsPage from './pages/forms';
 import AllocationForm from './pages/allocation';
@@ -15,9 +14,10 @@ import Account6Form from './pages/account6';
 import Account7Form from './pages/account7';
 import ApprovalForm from './pages/approvalformat';
 import ObjectionFormPage from './pages/objectionformat';
-import UserApprovalPage from './pages/Userapproval'; // New import for the approval page
+import UserApprovalPage from './pages/Userapproval';
+import IndividualFeeCommitteeForm from './components/induvidual-form';
 
-// Protected Route Component with simplified authentication check
+// Protected Route Component with improved authentication check
 const ProtectedRoute = ({ children }) => {
   const navigate = useNavigate();
   
@@ -35,8 +35,6 @@ const ProtectedRoute = ({ children }) => {
 
     // Initial check
     checkAuth();
-    
-    // Api responses will handle time-based restrictions - no need for frontend intervals
   }, [navigate]);
 
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -55,7 +53,7 @@ const AdminRoute = ({ children }) => {
   const isAdmin = userData.userType === 'Admin';
   
   if (!isAdmin) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/forms" replace />;
   }
   
   return <ProtectedRoute>{children}</ProtectedRoute>;
@@ -77,34 +75,39 @@ const Layout = ({ children }) => {
   );
 };
 
+// New component for the form view/edit page
+const FormViewEditPage = () => {
+  return (
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="bg-white rounded-lg shadow">
+        <div className="p-4">
+          <IndividualFeeCommitteeForm formType="Individual" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-    {/* Public Route - Login Page with more thorough authentication check */}
-<Route 
-  path="/" 
-  element={
-    (() => {
-      const isAuth = localStorage.getItem('isAuthenticated') === 'true';
-      const loginData = JSON.parse(localStorage.getItem('loginResponse') || '{}');
-      
-      // Only redirect if both conditions are true
-      if (isAuth && loginData?.output?.data) {
-        return <Navigate to="/home" replace />;
-      }
-      
-      // Otherwise show login page
-      return <LoginPage />;
-    })()
-  } 
-/>    {/* Public Route - Login Page with authentication check */}
+        {/* Public Route - Login Page with thorough authentication check */}
         <Route 
           path="/" 
           element={
-            localStorage.getItem('isAuthenticated') === 'true' ? 
-            <Navigate to="/home" replace /> : 
-            <LoginPage />
+            (() => {
+              const isAuth = localStorage.getItem('isAuthenticated') === 'true';
+              const loginData = JSON.parse(localStorage.getItem('loginResponse') || '{}');
+              
+              // Only redirect if both conditions are true
+              if (isAuth && loginData?.output?.data) {
+                return <Navigate to="/forms" replace />;
+              }
+              
+              // Otherwise show login page
+              return <LoginPage />;
+            })()
           } 
         />
 
@@ -121,17 +124,6 @@ const App = () => {
         />
 
         {/* Protected Routes */}
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <HomePage />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
         <Route
           path="/forms"
           element={
@@ -226,6 +218,18 @@ const App = () => {
             <ProtectedRoute>
               <Layout>
                 <Account4Form />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Add the new route for form view/edit */}
+        <Route
+          path="/form-view-edit/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <FormViewEditPage />
               </Layout>
             </ProtectedRoute>
           }

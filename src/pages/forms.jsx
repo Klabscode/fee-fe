@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { FileText, ArrowRight, ChevronLeft, Filter, Search, Calendar, ChevronDown, ChevronUp, Eye, Edit2, Lock, Unlock, AlertTriangle } from 'lucide-react';
+import { FileText, ArrowRight, ChevronLeft, Filter, Search, Calendar, ChevronDown, ChevronUp, Eye, Edit2, Lock, Unlock, AlertTriangle ,Trash2} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import IndividualFeeCommitteeForm from '../components/induvidual-form';
 import api from '../api/api';
@@ -265,6 +265,7 @@ const submitReallocation = async () => {
           return {
             ...form,
             allocatedTo: selectedSectionId,
+            status: 'Allocated', // Explicitly set status to 'Allocated'
             allocatedToSection: {
               ...form.allocatedToSection,
               id: selectedSectionId,
@@ -311,6 +312,7 @@ const submitReallocation = async () => {
 
 
 // This useEffect loads initial data and sets up periodic refreshes for admin users
+// This useEffect loads initial data but removes the automatic polling
 useEffect(() => {
   if (!token) {
     console.log('No authentication token found, skipping API calls');
@@ -354,16 +356,11 @@ useEffect(() => {
 
   loadData();
 
-  // Set up polling for Admin users
-  let intervalId = null;
-  if (userType === 'Admin') {
-    intervalId = setInterval(() => {
-      loadData();
-    }, 30000);
-  }
+  // Remove the polling interval to prevent auto-refresh
+  // No setInterval needed
 
   return () => {
-    if (intervalId) clearInterval(intervalId);
+    // No cleanup needed since we're not setting up an interval
   };
   
 }, [filters, token, userType, fetchForms, fetchPendingEditRequests, fetchSections, fetchDistricts, fetchSchoolTypes]);
@@ -719,6 +716,7 @@ if (userType === 'Report') {
       <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact Info</th>
       <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Data</th>
       <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fee Structure</th>
+      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
     </tr>
   );
 }
@@ -766,13 +764,13 @@ if (userType === 'Report') {
       </td>
       
       <td className="px-4 py-3 text-sm text-gray-900">
-  <div className="font-medium">{form.schoolName || 'N/A'}</div>
-  <div className="text-xs text-gray-500">{form.localityType || 'N/A'}</div>
-  <div className="text-xs text-gray-500 max-w-xs truncate" title={form.address}>
-    {truncateAddress(form.locality)}
-  </div>
-  <div className="text-xs text-gray-500">Classes: {formatClasses(form.classesFunctioning)}</div>
-</td>
+        <div className="font-medium">{form.schoolName || 'N/A'}</div>
+        <div className="text-xs text-gray-500">{form.localityType || 'N/A'}</div>
+        <div className="text-xs text-gray-500 max-w-xs truncate" title={form.address}>
+          {truncateAddress(form.locality)}
+        </div>
+        <div className="text-xs text-gray-500">Classes: {formatClasses(form.classesFunctioning)}</div>
+      </td>
       
       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-medium">
         {form.feeformSchoolId || 'N/A'}
@@ -785,41 +783,56 @@ if (userType === 'Report') {
       </td>
       
       <td className="px-4 py-3 text-sm text-gray-900">
-  {form.studentStrengthIndividual ? (
-    <button 
-      onClick={(e) => {
-        e.stopPropagation();
-        openDetailsModal(form, 'student');
-      }}
-      className="text-xs text-blue-600 hover:text-blue-800 flex items-center justify-center bg-blue-50 px-2 py-1 rounded-md w-full"
-      type="button"
-    >
-      <Eye className="h-3 w-3 mr-1" />
-      View Class-wise Details
-    </button>
-  ) : (
-    'N/A'
-  )}
-</td>
+        {form.studentStrengthIndividual ? (
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              openDetailsModal(form, 'student');
+            }}
+            className="text-xs text-blue-600 hover:text-blue-800 flex items-center justify-center bg-blue-50 px-2 py-1 rounded-md w-full"
+            type="button"
+          >
+            <Eye className="h-3 w-3 mr-1" />
+            View Class-wise Details
+          </button>
+        ) : (
+          'N/A'
+        )}
+      </td>
 
-<td className="px-4 py-3 text-sm text-gray-900">
-  {form.allocateformReference ? (
-    <button 
-      onClick={(e) => {
-        e.stopPropagation();
-        openDetailsModal(form, 'fee');
-      }}
-      className="text-xs text-blue-600 hover:text-blue-800 flex items-center justify-center bg-blue-50 px-2 py-1 rounded-md w-full"
-      type="button"
-    >
-      <Eye className="h-3 w-3 mr-1" />
-      View Complete Fee Details
-    </button>
-  ) : (
-    'N/A'
-  )}
-</td>
-
+      <td className="px-4 py-3 text-sm text-gray-900">
+        {form.allocateformReference ? (
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              openDetailsModal(form, 'fee');
+            }}
+            className="text-xs text-blue-600 hover:text-blue-800 flex items-center justify-center bg-blue-50 px-2 py-1 rounded-md w-full"
+            type="button"
+          >
+            <Eye className="h-3 w-3 mr-1" />
+            View Complete Fee Details
+          </button>
+        ) : (
+          'N/A'
+        )}
+      </td>
+      
+      <td className="px-4 py-3 whitespace-nowrap">
+        <div className="flex items-center">
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            form.status === 'Completed' ? 'bg-green-100 text-green-800' : 
+            form.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 
+            form.status === 'Allocated' ? 'bg-blue-100 text-blue-800' :
+       
+            'bg-gray-100 text-gray-800'
+          }`}>
+            {form.status || 'Unknown'}
+          </span>
+          {renderEditRequestBadge(form)}
+          {renderFrozenBadge(form)}
+        </div>
+      </td>
     </tr>
   );
 }
@@ -835,19 +848,20 @@ if (userType === 'Report') {
             <div className="text-xs text-gray-500 max-w-xs truncate" title={form.locality}>{truncateAddress(form.locality, 20)}</div>
           </td>
           <td className="px-4 py-3 whitespace-nowrap">
-            <div className="flex items-center">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                form.status === 'Completed' ? 'bg-green-100 text-green-800' : 
-                form.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 
-                form.status === 'Allocated' ? 'bg-blue-100 text-blue-800' :
-                'bg-gray-100 text-gray-800'
-              }`}>
-                {form.status || 'Unknown'}
-              </span>
-              {renderEditRequestBadge(form)}
-              {renderFrozenBadge(form)}
-            </div>
-          </td>
+  <div className="flex items-center">
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+      form.status === 'Completed' ? 'bg-green-100 text-green-800' : 
+      form.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 
+      form.status === 'Allocated' ? 'bg-blue-100 text-blue-800' :
+      form.status === 'Not Allocated' ? 'bg-gray-100 text-gray-800' :
+      'bg-gray-100 text-gray-800'
+    }`}>
+      {form.status || 'Unknown'}
+    </span>
+    {renderEditRequestBadge(form)}
+    {renderFrozenBadge(form)}
+  </div>
+</td>
           <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
             {form.status && form.status.trim() === 'Completed' ? (
               form.isFrozen ? (
@@ -929,67 +943,113 @@ if (userType === 'Report') {
         </td>
 
 
-{userType === 'Admin' && (
+        {userType === 'Admin' && (
   <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-    {form.status === 'Completed' && (
-      <div className="flex items-center justify-end space-x-2">
-        {form.editRequestStatus === 'Requested' ? (
-          <>
-            <button 
-              onClick={() => handleProcessEditRequest(form.id, 'approve')}
-              className="text-green-600 hover:text-green-900 bg-green-50 px-2 py-1 rounded-md transition-colors text-xs"
-              disabled={submitting}
-              type="button"
-            >
-              Approve
-            </button>
-            <button 
-              onClick={() => handleProcessEditRequest(form.id, 'reject')}
-              className="text-red-600 hover:text-red-900 bg-red-50 px-2 py-1 rounded-md transition-colors text-xs"
-              disabled={submitting}
-              type="button"
-            >
-              Reject
-            </button>
-          </>
-        ) : (
-          form.isFrozen ? (
-            <button 
-              onClick={() => handleUnfreezeForm(form.id)}
-              className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition-colors flex items-center"
-              disabled={submitting}
-              type="button"
-            >
-              <Unlock className="h-4 w-4 mr-1" />
-              Unfreeze
-            </button>
-          ) : (
-            <button 
-              onClick={() => handleFreezeForm(form.id)}
-              className="text-gray-600 hover:text-gray-900 bg-gray-50 px-3 py-1 rounded-md transition-colors flex items-center"
-              disabled={submitting}
-              type="button"
-            >
-              <Lock className="h-4 w-4 mr-1" />
-              Freeze
-            </button>
-          )
-        )}
-      </div>
-    )}
-    
-    {/* Add Reallocate button for Allocated forms */}
-    {form.status === 'Allocated' && (
+    <div className="flex flex-row space-x-2 items-center">
       <button 
-        onClick={() => handleReallocate(form)}
-        className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md transition-colors flex items-center"
+        onClick={() => navigate(`/form-view-edit/${form.id}`)}
+        className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition-colors flex items-center justify-center"
+        type="button"
+      >
+        <Eye className="h-4 w-4 mr-1" />
+        View/Edit
+      </button>
+      
+      <button 
+        onClick={() => {
+          if(window.confirm('Are you sure you want to delete this form? This action cannot be undone.')) {
+            // Add API call to delete the form
+            const deleteForm = async () => {
+              try {
+                setSubmitting(true);
+                const headers = { 'Authorization': token };
+                const response = await api.delete(`/deleteForm?id=${form.id}`, { headers });
+                
+                if (response?.status === 200) {
+                  // Remove the form from local state
+                  setForms(prevForms => prevForms.filter(f => f.id !== form.id));
+                  alert('Form deleted successfully');
+                } else {
+                  throw new Error('Failed to delete form');
+                }
+              } catch (error) {
+                console.error('Error deleting form:', error);
+                alert(`Error deleting form: ${error.message || 'Unknown error'}`);
+              } finally {
+                setSubmitting(false);
+              }
+            };
+            
+            deleteForm();
+          }
+        }}
+        className="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md transition-colors flex items-center justify-center"
         disabled={submitting}
         type="button"
       >
-        <ArrowRight className="h-4 w-4 mr-1" />
-        Reallocate
+        <Trash2 className="h-4 w-4 mr-1" />
+        Delete
       </button>
-    )}
+      
+      {form.status === 'Completed' && (
+        <>
+          {form.editRequestStatus === 'Requested' ? (
+            <>
+              <button 
+                onClick={() => handleProcessEditRequest(form.id, 'approve')}
+                className="text-green-600 hover:text-green-900 bg-green-50 px-2 py-1 rounded-md transition-colors text-xs"
+                disabled={submitting}
+                type="button"
+              >
+                Approve
+              </button>
+              <button 
+                onClick={() => handleProcessEditRequest(form.id, 'reject')}
+                className="text-red-600 hover:text-red-900 bg-red-50 px-2 py-1 rounded-md transition-colors text-xs"
+                disabled={submitting}
+                type="button"
+              >
+                Reject
+              </button>
+            </>
+          ) : (
+            form.isFrozen ? (
+              <button 
+                onClick={() => handleUnfreezeForm(form.id)}
+                className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition-colors flex items-center"
+                disabled={submitting}
+                type="button"
+              >
+                <Unlock className="h-4 w-4 mr-1" />
+                Unfreeze
+              </button>
+            ) : (
+              <button 
+                onClick={() => handleFreezeForm(form.id)}
+                className="text-gray-600 hover:text-gray-900 bg-gray-50 px-3 py-1 rounded-md transition-colors flex items-center"
+                disabled={submitting}
+                type="button"
+              >
+                <Lock className="h-4 w-4 mr-1" />
+                Freeze
+              </button>
+            )
+          )}
+        </>
+      )}
+      
+      {form.status === 'Allocated' && (
+        <button 
+          onClick={() => handleReallocate(form)}
+          className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md transition-colors flex items-center"
+          disabled={submitting}
+          type="button"
+        >
+          <ArrowRight className="h-4 w-4 mr-1" />
+          Reallocate
+        </button>
+      )}
+    </div>
   </td>
 )}
       </tr>
@@ -1255,20 +1315,84 @@ const ReallocationModal = () => {
 // Edit Request Modal - Improved for better input responsiveness
 // Replace your current EditRequestModal with this fixed version
 const EditRequestModal = () => {
-  // Use a local state for the textarea to ensure smooth typing
-  const [localReason, setLocalReason] = useState(editReason);
+  // Create local state that's independent of parent component's state
+  const [localReason, setLocalReason] = useState('');
   
-  // Update local state when parent state changes
+  // Initialize local state when modal opens
   useEffect(() => {
     setLocalReason(editReason);
-  }, [editReason]);
+  }, [showEditRequestModal]);
   
-  // Handle the actual submission
-  const handleSubmit = (e) => {
+  // Separate useEffect just for handling focus safely
+  useEffect(() => {
+    // Only try to focus if the modal is shown and the ref exists
+    if (showEditRequestModal && editReasonRef.current) {
+      // Give DOM time to render fully
+      const timer = setTimeout(() => {
+        editReasonRef.current?.focus();
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showEditRequestModal]);
+  
+  // Create a custom submission function that uses the local state
+  const handleSubmitRequest = (e) => {
     e.preventDefault();
-    // Update parent state before submitting
+    
+    if (!localReason.trim()) {
+      alert('Please provide a reason for the edit request');
+      return;
+    }
+    
+    // Set the parent state only once, right before submission
     setEditReason(localReason);
-    submitEditRequest();
+    
+    // Then call the API with the local state value directly
+    submitEditRequestWithReason(localReason);
+  };
+  
+  // This is a new function that takes the reason as a parameter
+  const submitEditRequestWithReason = async (reason) => {
+    try {
+      setSubmitting(true);
+      const headers = { 'Authorization': token };
+      
+      // Make the API call with the passed reason
+      const response = await api.post('/requestFormEdit', {
+        formId: currentForm.id,
+        reason: reason,
+        userId: userId
+      }, { headers });
+      
+      if (response?.status === 200) {
+        // Create a copy of the form to update local state
+        const updatedForm = {
+          ...currentForm,
+          editRequestStatus: 'Requested',
+          editRequestDate: new Date().toISOString(),
+          editRequestReason: reason
+        };
+        
+        // Update local state
+        setForms(prevForms => 
+          prevForms.map(form => form.id === currentForm.id ? updatedForm : form)
+        );
+        
+        // Close modal
+        setShowEditRequestModal(false);
+        
+        // Show success message
+        alert('Edit request submitted successfully');
+      } else {
+        alert('Failed to submit edit request');
+      }
+    } catch (error) {
+      console.error('Error submitting edit request:', error);
+      alert(`Error submitting edit request`);
+    } finally {
+      setSubmitting(false);
+    }
   };
   
   return (
@@ -1282,7 +1406,7 @@ const EditRequestModal = () => {
     >
       <form 
         className="bg-white rounded-lg shadow-xl max-w-md w-full"
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmitRequest}
       >
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900">Request Form Edit</h3>
@@ -1297,7 +1421,6 @@ const EditRequestModal = () => {
               value={localReason}
               onChange={(e) => setLocalReason(e.target.value)}
               placeholder="Enter reason for edit request..."
-              autoFocus
             ></textarea>
           </div>
           <div className="text-sm text-gray-500">
@@ -1332,7 +1455,6 @@ const EditRequestModal = () => {
     </div>
   );
 };
-
 // Edit Requests Modal for Admin
 const EditRequestsModal = () => (
   <div 
@@ -1440,7 +1562,7 @@ if (userType !== 'Admin' && userType !== 'Section' && userType !== 'Report' && u
 return (
  
   <div className="min-h-screen bg-gray-50">
-    
+
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
       {!showForm ? (
         <div className="space-y-4">

@@ -493,9 +493,18 @@ const Account7Form = () => {
     const strength = parseInt(form.studentStrength[className].strength) || 0;
     const income = Math.round(strength * value); // Round the income
     
-    // Calculate future fees with 10% increase each year, rounded
-    const fee2025 = Math.round(value * 1.10);
-    const fee2026 = Math.round(fee2025 * 1.10);
+    // Calculate future fees with 10% increase each year, then round to nearest multiple of 5
+    const fee2025Base = value * 1.10;
+    const fee2026Base = fee2025Base * 1.10;
+    
+    // Function to round to nearest multiple of 5
+    const roundToMultipleOf5 = (num) => {
+      return Math.round(num / 5) * 5;
+    };
+    
+    // Apply rounding to nearest multiple of 5
+    const fee2025 = roundToMultipleOf5(fee2025Base);
+    const fee2026 = roundToMultipleOf5(fee2026Base);
     
     const updatedForm = {
       ...form,
@@ -519,16 +528,19 @@ const Account7Form = () => {
     setForm(updatedForm);
     calculateTotals(updatedForm.studentStrength);
   };
-
   const handleFutureFeeChange = (className, year, value) => {
-    if (value < 0) value = 0;  
+    if (value < 0) value = 0;
+    
+    // Round to nearest multiple of 5
+    const roundedValue = Math.round(value / 5) * 5;
+    
     setForm(prev => ({
       ...prev,
       futureFees: {
         ...prev.futureFees,
         [className]: {
           ...prev.futureFees[className],
-          [year]: value.toString()
+          [year]: roundedValue.toString()
         }
       }
     }));
