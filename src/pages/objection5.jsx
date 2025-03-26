@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/api';
 
-const AccountFiveFormat = () => {
+const AccountFiveFormat = ({schoolDetails}) => {
   const [formData, setFormData] = useState(null);
 
   useEffect(() => {
@@ -38,8 +38,12 @@ const AccountFiveFormat = () => {
   const numberCellClasses = "border border-gray-300 px-4 py-2 text-center";
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow p-6">
+    
+    <div className="min-h-screen bg-50 p-6 mb-80">
+        <div className="flex justify-end items-start mb-4">
+          <p className="text-sm">School Code: {schoolDetails?.code || ''}</p>
+        </div>
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow p-6 mb-48">
         <h2 className="text-center font-bold text-lg mb-6">Account V - Infrastructure</h2>
      
         

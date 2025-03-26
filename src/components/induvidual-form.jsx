@@ -3,6 +3,7 @@ import api from '../api/api';
 import { useNavigate, useParams } from 'react-router-dom';
 import Account4Form from '../pages/account4';
 
+
 const IndividualFeeCommitteeForm = ({ formType = 'Individual', initialData = null, formId = null }) => {
   const [districts, setDistricts] = useState([]);
   const [schoolTypes, setSchoolTypes] = useState([]);
@@ -596,7 +597,9 @@ const IndividualFeeCommitteeForm = ({ formType = 'Individual', initialData = nul
         
         if (response.status === 200) {
           alert('Form submitted successfully!');
-          navigate('/forms');
+          window.location.href = '/forms';
+          window.location.reload();
+          
         }
       }
     } catch (error) {
@@ -911,9 +914,13 @@ const IndividualFeeCommitteeForm = ({ formType = 'Individual', initialData = nul
 
 {/* Submit Button */}
 <div className="flex justify-end">
-  <button type="submit" className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-lg">
-    {isEditMode ? 'Update Form' : 'Submit Form'}
-  </button>
+<button 
+  type="submit"
+
+  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-lg"
+>
+  {isEditMode ? 'Update Form' : 'Submit Form'}
+</button>
 </div>
 </form>
   );

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/api';
 
-const AccountOneFormat = () => {
+const AccountOneFormat = ({ schoolDetails }) => {
   const [formData, setFormData] = useState(null);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,8 +31,15 @@ const AccountOneFormat = () => {
     fetchData();
   }, []);
 
+  console.log(schoolDetails.code)
+  
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-50 p-6">
+        <div className="flex justify-end items-start mb-4">
+          <p className="text-sm">School Code: {schoolDetails?.code || ''}</p>
+        </div>
+
       <div className="max-w-5xl mx-auto bg-white rounded-lg shadow p-6">
 
         
@@ -45,7 +51,7 @@ const AccountOneFormat = () => {
           <div className="mb-8">
             <h4 className="font-semibold mb-4">A. Salary and Allowances</h4>
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-300 table-fixed">
+              <table className="w-full border-collapse border border-gray-300 table-fixed mb-48">
                 <thead>
                   <tr>
                     <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '20%'}}>HEAD OF EXPENDITURE</th>
@@ -180,10 +186,13 @@ const AccountOneFormat = () => {
             </div>
           </div>
 
-          <div className="mb-8">
+          <div className="mb-80">
+          <div className="flex justify-end items-start mb-4">
+          <p className="text-sm">School Code: {schoolDetails?.code || ''}</p>
+        </div>
             <h4 className="font-semibold mb-4">B. Other Schemes and Benefits for the Staff</h4>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-300 table-fixed">
+            <div className="overflow-x-auto ">
+              <table className="w-full border-collapse border border-gray-300 table-fixed mb-32">
                 <thead>
                   <tr>
                     <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '20%'}}>HEAD OF EXPENDITURE</th>

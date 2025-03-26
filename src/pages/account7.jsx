@@ -729,9 +729,9 @@ if (response.status === 200) {
   // Only navigate if difference exists
   if (totals.difference !== '') {
     if (totals.difference >= 0) {
-      navigate('/approve');
-    } else {
       navigate('/objection');
+    } else {
+      navigate('/approve');
     }
   }
 } else {

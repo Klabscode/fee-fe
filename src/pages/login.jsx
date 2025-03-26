@@ -36,6 +36,13 @@ const LoginPage = () => {
   useEffect(() => {
     if (selectedUserType && !isRegistering) {
       fetchUserNames(selectedUserType);
+      // Clear username and password when user type changes
+      setSelectedUserName('');
+      setPassword('');
+      setError('');
+      setStatusMessage('');
+      setStatusType('');
+      setLoginAttempts(0);
     }
   }, [selectedUserType, isRegistering]);
 
@@ -75,6 +82,7 @@ const LoginPage = () => {
       setIsLoading(false);
     }
   };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     
@@ -118,11 +126,8 @@ const LoginPage = () => {
       setStatusMessage('Login successful! Redirecting...');
       setStatusType('success');
       
-      // Add a small delay before redirecting to ensure data is properly stored
-      setTimeout(() => {
-        // Navigate to forms page instead of home
-        navigate('/forms');
-      }, 500);
+      // Navigate to forms page immediately without waiting for refresh
+      navigate('/forms');
       
     } catch (err) {
       console.error('Login error:', err);
@@ -149,25 +154,19 @@ const LoginPage = () => {
       } else {
         // For network errors or unexpected issues
         setStatusType('error');
-        
-        // If multiple attempts, provide more specific guidance
-        if (loginAttempts >= 3) {
-          setError('Connection issues detected. Trying again may resolve the problem.');
-          
-          // After 5 attempts, force a retry with a different approach
-          if (loginAttempts >= 5) {
-            retryLogin();
-          }
-        } else {
-          setError('Login failed. Please check your connection and try again.');
-        }
+        setError('Login failed. Please check your connection and try again.');
+      }
+      
+      // Reset login attempts counter for invalid credentials
+      // Only show the "Try Again" button for actual network issues
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        setLoginAttempts(0);
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Function to retry login with a different approach
   const retryLogin = async () => {
     if (!selectedUserType || !selectedUserName || !password) {
       return;
@@ -209,10 +208,8 @@ const LoginPage = () => {
       setStatusMessage('Login successful! Redirecting...');
       setStatusType('success');
       
-      // Navigate to forms page
-      setTimeout(() => {
-        navigate('/forms');
-      }, 500);
+      // Navigate to forms page immediately
+      navigate('/forms');
       
     } catch (err) {
       console.error('Retry login error:', err);
@@ -223,7 +220,6 @@ const LoginPage = () => {
     }
   };
 
-  // Force login function - to be used for the "Try Again" button
   const forceLogin = () => {
     if (!selectedUserType || !selectedUserName || !password) {
       setError('Please fill in all fields');
@@ -401,166 +397,162 @@ const LoginPage = () => {
             </div>
           )}
 
-          {/* Form */}
-          {!registrationSuccess && !rejectedUser && (
-            <form onSubmit={isRegistering ? handleRegister : handleLogin} className="space-y-5">
-              {error && (
-                <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 text-sm rounded">
-                  <p>{error}</p>
-                  {loginAttempts >= 3 && !isRegistering && (
-                    <div className="mt-2">
-                      <button
-                        type="button"
-                        onClick={forceLogin}
-                        className="text-red-700 underline font-medium"
-                      >
-                        Try Again (Alternative)
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+      {/* Form */}
+{!registrationSuccess && !rejectedUser && (
+  <form onSubmit={isRegistering ? handleRegister : handleLogin} className="space-y-5">
+    {error && (
+      <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 text-sm rounded">
+        <p>{error}</p>
+        {/* Only show "Try Again" button for network errors, not credential errors */}
+        {loginAttempts >= 3 && !isRegistering && !error.includes('credentials') && (
+          <div className="mt-2">
+            <button
+              type="button"
+              onClick={forceLogin}
+              className="text-red-700 underline font-medium"
+            >
+              Try Again (Alternative)
+            </button>
+          </div>
+        )}
+      </div>
+    )}
 
-              {statusMessage && !error && (
-                <div className={`${
-                  statusType === 'warning' ? 'bg-yellow-50 border-yellow-500 text-yellow-700' : 
-                  statusType === 'success' ? 'bg-green-50 border-green-500 text-green-700' :
-                  statusType === 'info' ? 'bg-blue-50 border-blue-500 text-blue-700' :
-                  'bg-red-50 border-red-500 text-red-700'
-                } border-l-4 p-4 text-sm rounded flex`}>
-                  <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
-                  <p>{statusMessage}</p>
-                </div>
-              )}
+    {statusMessage && !error && (
+      <div className={`${
+        statusType === 'warning' ? 'bg-yellow-50 border-yellow-500 text-yellow-700' : 
+        statusType === 'success' ? 'bg-green-50 border-green-500 text-green-700' :
+        statusType === 'info' ? 'bg-blue-50 border-blue-500 text-blue-700' :
+        'bg-red-50 border-red-500 text-red-700'
+      } border-l-4 p-4 text-sm rounded flex`}>
+        <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+        <p>{statusMessage}</p>
+      </div>
+    )}
 
-              {/* User Type Dropdown */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  User Type
-                </label>
-                <div className="relative">
-                  <select
-                    value={selectedUserType}
-                    onChange={(e) => setSelectedUserType(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                    disabled={isLoading}
-                  >
-                    <option value="">Select User Type</option>
-                    {userTypes.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-                </div>
-              </div>
+    {/* User Type Dropdown */}
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        User Type
+      </label>
+      <div className="relative">
+        <select
+          value={selectedUserType}
+          onChange={(e) => setSelectedUserType(e.target.value)}
+          className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+          disabled={isLoading}
+        >
+          <option value="">Select User Type</option>
+          {userTypes.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+      </div>
+    </div>
 
-              {/* Username Field */}
-              {isRegistering ? (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    New Username
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <User className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <input
-                      type="text"
-                      value={newUserName}
-                      onChange={(e) => setNewUserName(e.target.value)}
-                      className="pl-10 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                      placeholder="Enter new username"
-                      disabled={isLoading}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Username
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={selectedUserName}
-                      onChange={(e) => setSelectedUserName(e.target.value)}
-                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                      disabled={!selectedUserType || isLoading}
-                    >
-                      <option value="">Select Username</option>
-                      {userNames.map((name) => (
-                        <option key={name} value={name}>
-                          {name}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-                  </div>
-                </div>
-              )}
+    {/* Username Field */}
+    {isRegistering ? (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          New Username
+        </label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <User className="h-4 w-4 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            value={newUserName}
+            onChange={(e) => setNewUserName(e.target.value)}
+            className="pl-10 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+            placeholder="Enter new username"
+            disabled={isLoading}
+          />
+        </div>
+      </div>
+    ) : (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Username
+        </label>
+        <div className="relative">
+          <select
+            value={selectedUserName}
+            onChange={(e) => {
+              setSelectedUserName(e.target.value);
+              // Clear password when username changes
+              setPassword('');
+              setError('');
+              setStatusMessage('');
+            }}
+            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+            disabled={!selectedUserType || isLoading}
+          >
+            <option value="">Select Username</option>
+            {userNames.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+        </div>
+      </div>
+    )}
 
-              {/* Password Input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-4 w-4 text-gray-400" />
-                  </div>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                    placeholder="Enter your password"
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
+    {/* Password Input */}
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Password
+      </label>
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Lock className="h-4 w-4 text-gray-400" />
+        </div>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="pl-10 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+          placeholder="Enter your password"
+          disabled={isLoading}
+        />
+      </div>
+    </div>
 
-              {/* Submit Button */}
-              <div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? (
-                    <span className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </span>
-                  ) : isRegistering ? (
-                    'Register Account'
-                  ) : (
-                    'Sign In'
-                  )}
-                </button>
-              </div>
-
-              {/* Toggle Login/Register */}
-              <div className="text-center mt-4">
-                <button
-                  type="button"
-                  onClick={toggleMode}
-                  className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
-                >
-                  {isRegistering ? 'Already have an account? Sign in' : 'Need an account? Register now'}
-                </button>
-              </div>
-            </form>
-          )}
+    {/* Submit Button */}
+    <div>
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {isLoading ? (
+          <span className="flex items-center">
+            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Processing...
+          </span>
+        ) : isRegistering ? (
+          'Register Account'
+        ) : (
+          'Sign In'
+        )}
+      </button>
+    </div>
+  </form>
+)}
         </div>
       </div>
 
       {/* Right side - Illustration */}
       <div className="hidden lg:block lg:w-1/2 relative bg-indigo-50">
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center">
           <img 
             src="/images/login.png" 
             alt="Government Services Illustration" 

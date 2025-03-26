@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/api';
 
-const AccountSevenFormat = () => {
+const AccountSevenFormat = ({schoolDetails}) => {
   const [formData, setFormData] = useState(null);
   const [strengthData, setStrengthData] = useState(null);
   const [parsedStrengthData, setParsedStrengthData] = useState(null);
@@ -62,15 +62,18 @@ const AccountSevenFormat = () => {
   const numberCellClasses = "border border-gray-300 px-4 py-2 text-center";
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-50 p-6">
+        <div className="flex justify-end items-start mb-4">
+          <p className="text-sm">School Code: {schoolDetails?.code || ''}</p>
+        </div>
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow p-6">
-        <h2 className="text-center font-bold text-lg mb-6">Account VII - Fee Structure</h2>
+        <h2 className="text-center font-bold text-lg mb-6 mb-32">Account VII - Fee Structure</h2>
 
 
         {/* Fee Structure 2024-25 */}
-        <div className="mb-8">
+        <div className="mb-48">
           <h3 className="font-semibold mb-4">Fee structure for 2024-25</h3>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto" >
             <table className={tableClasses}>
               <thead>
                 <tr>
@@ -114,7 +117,7 @@ const AccountSevenFormat = () => {
         </div>
 
         {/* Fee Structure 2025-26 & 2026-27 */}
-        <div className="mb-8">
+        <div className="mb-80">
           <h3 className="font-semibold mb-4">Fee Structure for 2025-26 & 2026-27</h3>
           <div className="overflow-x-auto">
             <table className={tableClasses}>

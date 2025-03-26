@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/api';
 
-const AccountThreeFormat = () => {
+const AccountThreeFormat = ({schoolDetails}) => {
   const [formData, setFormData] = useState(null);
 
   useEffect(() => {
@@ -33,8 +33,11 @@ const AccountThreeFormat = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow p-6">
+    <div className="min-h-screen bg-gray-50 ">
+        <div className="flex justify-end items-start mb-4">
+          <p className="text-sm">School Code: {schoolDetails?.code || ''}</p>
+        </div>
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow ">
         <h2 className="text-center font-bold text-lg mb-6">Account III - Expenses on Specific Purposes</h2>
       
         

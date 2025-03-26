@@ -242,29 +242,30 @@ const ApprovalFormat = () => {
         </div>
    
         <div style="margin-bottom: 20px;">
-           <p style="white-space: pre-wrap; margin: 0;">${schoolDetails.name}</p>
-          <p style="white-space: pre-wrap; margin: 0;">${schoolDetails.address}</p>
+   
         </div>
    
         <div style="text-align: center; margin-bottom: 30px;">
           <h1 style="margin: 0 0 10px 0; font-size: 18px;">PROCEEDINGS OF THE TAMIL NADU PRIVATE SCHOOLS</h1>
           <h2 style="margin: 0 0 10px 0; font-size: 18px;">FEE DETERMINATION COMMITTEE</h2>
           <p style="margin: 0;">Dated: ${date}</p>
+          <p style="white-space: pre-wrap; margin: 0;">${schoolDetails.name}</p>
+          <p style="white-space: pre-wrap; margin: 0;">${schoolDetails.address}</p>
         </div>
    
-        <div style="margin-bottom: 30px;">
-          <h2 style="text-align: center; margin-bottom: 20px; font-size: 16px;">ORDER</h2>
-          <p style="text-align: justify; margin-bottom: 10px;">1. In the Judgement reported in 2010(4) CTC 353, it is held in Paragraph 20(b) and (c) as follows:</p>
+        <div style="margin-bottom: 220px;">
+          <h2 style="text-align: center; margin-bottom: 110px; font-size: 25px;">ORDER</h2>
+          <p style="text-align: justify; margin-bottom: 10px;font-size: 20px;">1. In the Judgement reported in 2010(4) CTC 353, it is held in Paragraph 20(b) and (c) as follows:</p>
           <div style="margin-left: 20px;">
-            <p style="text-align: justify; margin-bottom: 10px;">(b) "After the receipt of the proposal from the concerned Institution, the Committee has to verify as to whether the fee proposed by the Private School is Justified and it does not amount to profiteering or charging of exorbitant fee"</p>
-            <p style="text-align: justify; margin-bottom: 10px;">(c) "In case the Committee is of the view that the fee structure proposed by the institution appears to be correct, taking note of the various facilities provided and that there was no profiteering or collection of exorbitant fee under the guise of capitation fee, it has to approve the fee structure"</p>
+            <p style="text-align: justify; margin-bottom: 10px;font-size: 20px;">(b) "After the receipt of the proposal from the concerned Institution, the Committee has to verify as to whether the fee proposed by the Private School is Justified and it does not amount to profiteering or charging of exorbitant fee"</p>
+            <p style="text-align: justify; margin-bottom: 10px;font-size: 20px;">(c) "In case the Committee is of the view that the fee structure proposed by the institution appears to be correct, taking note of the various facilities provided and that there was no profiteering or collection of exorbitant fee under the guise of capitation fee, it has to approve the fee structure"</p>
           </div>
-          <p style="text-align: justify;">2. The Committee examined the application along with the records submitted with due care and caution. On such examination the Committee is satisfied that the fee structure submitted by the school does not amount to profiteering or charging exorbitant fee. Therefore the committee is approving and determining the fee structure as proposed by the school</p>
+          <p style="text-align: justify;font-size: 20px;">2. The Committee examined the application along with the records submitted with due care and caution. On such examination the Committee is satisfied that the fee structure submitted by the school does not amount to profiteering or charging exorbitant fee. Therefore the committee is approving and determining the fee structure as proposed by the school</p>
         </div>
    
-        <div style="margin-bottom: 30px;">
+        <div style="margin-bottom: 450px;">
           <h3 style="margin-bottom: 15px; font-size: 16px;">Fee structure for 2025-26 (Approval)</h3>
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 370px;">
             <tr style="background-color: #f3f4f6;">
               <th style="border: 1px solid #000; padding: 8px; text-align: center;">Class</th>
               <th style="border: 1px solid #000; padding: 8px; text-align: center;">Student strength</th>
@@ -296,7 +297,7 @@ const ApprovalFormat = () => {
           </table>
         </div>
    
-        <div style="margin-bottom: 60px; page-break-inside: avoid;">
+        <div style="margin-bottom: 2px; page-break-inside: avoid;">
           <p style="text-align: justify; margin-bottom: 80px;">
             3. The School in question is directed to have this order affixed on the notice board of 
             the school for the information of the students and parents etc.,
@@ -304,36 +305,44 @@ const ApprovalFormat = () => {
    
 
 
-<div style="page-break-inside: avoid; margin-top: 80px;">
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 60px;">
-    <div style="text-align: center;">
-      <div style="border-top: 1px solid #000; padding-top: 12px; margin: 0 auto; width: 250px;">
-        <p style="margin: 0; font-size: 14px;">Chairman</p>
+<div style="page-break-inside: avoid; margin-top: 10px; text-align: center;">
+  <div style="border-top: 1px solid #000; padding-top: 12px; margin: 0 auto; width: 300px;">
+    
+    <p style="margin: 0; font-size: 14px;font-weight: bold;">Chairman</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 100px;">
+    <div>
+      <div style="border-top: 1px solid #000; padding-top: 12px; width: 250px; margin: 0 auto;">
+        <p style="margin: 0; font-size: 14px;"School Education Department</p>
+        <p style="margin: 0; font-size: 14px; font-weight: bold;">Member - Secretary</p>
       </div>
     </div>
-    <div style="text-align: center;">
-      <div style="border-top: 1px solid #000; padding-top: 12px; margin: 0 auto; width: 250px;">
-        <p style="margin: 0; font-size: 14px;">Member</p>
-      </div>
-    </div>
-    <div style="text-align: center;">
-      <div style="border-top: 1px solid #000; padding-top: 12px; margin: 0 auto; width: 250px;">
-        <p style="margin: 0; font-size: 14px;">School Education Department</p>
-        <p style="margin: 0; font-size: 14px;">Member - Secretary</p>
-      </div>
-    </div>
-    <div style="text-align: center;">
-      <div style="border-top: 1px solid #000; padding-top: 12px; margin: 0 auto; width: 250px;">
-        <p style="margin: 0; font-size: 14px;">Member</p>
+    <div>
+      <div style="border-top: 1px solid #000; padding-top: 12px; width: 250px; margin: 0 auto;">
+        
+        <p style="margin: 0; font-size: 14px; font-weight: bold;">Member</p>
       </div>
     </div>
   </div>
-  
-  <div style="text-align: center; margin-top: 60px;">
-    <div style="border-top: 1px solid #000; padding-top: 12px; margin: 0 auto; width: 250px;">
-      <p style="margin: 0; font-size: 14px;">Public Works Department</p>
-      <p style="margin: 0; font-size: 14px;">Member</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 130px;">
+    <div>
+      <div style="border-top: 1px solid #000; padding-top: 12px; width: 250px; margin: 0 auto;">
+        
+        <p style="margin: 0; font-size: 14px; font-weight: bold;">Member</p>
+      </div>
     </div>
+    <div>
+      <div style="border-top: 1px solid #000; padding-top: 12px; width: 250px; margin: 0 auto;">
+        <p style="margin: 0; font-size: 14px;">Public Works Department</p>
+        <p style="margin: 0; font-size: 14px; font-weight: bold;">Member</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   </div>
 </div>
         </div>

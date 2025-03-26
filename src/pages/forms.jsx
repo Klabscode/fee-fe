@@ -51,6 +51,14 @@ const [selectedSectionId, setSelectedSectionId] = useState('');
       console.error('Error parsing JSON:', e);
       return {};
     }
+
+  };
+  const handleFormSubmitted = () => {
+    // Reset to show the forms list
+    setShowForm(false);
+    
+    // Refresh the forms list to include the new submission
+    fetchForms();
   };
   const fetchDistricts = useCallback(async () => {
     try {
@@ -706,21 +714,20 @@ const handleUnfreezeForm = async (formId) => {
   };
 
   const renderTableHeaders = () => {
-// For the Table Headers - a simpler, cleaner structure
-if (userType === 'Report') {
-  return (
-    <tr>
-      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">School Details</th>
-      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">School ID</th>
-      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact Info</th>
-      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Data</th>
-      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fee Structure</th>
-      <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-    </tr>
-  );
-}
-    else if (userType === 'Section') {
+    // For the Table Headers - a simpler, cleaner structure
+    if (userType === 'Report') {
+      return (
+        <tr>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">School Details</th>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">School ID</th>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact Info</th>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Data</th>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fee Structure</th>
+          <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        </tr>
+      );
+    } else if (userType === 'Section') {
       // For Section users - limited information plus actions column
       return (
         <tr>
@@ -729,11 +736,11 @@ if (userType === 'Report') {
           <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Classes</th>
           <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
           <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-          <th className="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          <th className="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Form Actions</th>
         </tr>
       );
     }
-    // For Admin and Entry users - add an actions column
+    // For Admin and Entry users - add an actions column with clear label
     return (
       <tr>
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
@@ -746,7 +753,9 @@ if (userType === 'Report') {
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Allocated To</th>
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
         {userType === 'Admin' && (
-          <th className="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          <th className="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Form Management
+          </th>
         )}
       </tr>
     );
@@ -946,6 +955,7 @@ if (userType === 'Report') {
         {userType === 'Admin' && (
   <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
     <div className="flex flex-row space-x-2 items-center">
+      {/* View/Edit Button */}
       <button 
         onClick={() => navigate(`/form-view-edit/${form.id}`)}
         className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition-colors flex items-center justify-center"
@@ -955,6 +965,7 @@ if (userType === 'Report') {
         View/Edit
       </button>
       
+      {/* Delete Button */}
       <button 
         onClick={() => {
           if(window.confirm('Are you sure you want to delete this form? This action cannot be undone.')) {
@@ -991,6 +1002,18 @@ if (userType === 'Report') {
         Delete
       </button>
       
+      {/* Reallocate Button - Now shown for all statuses */}
+      <button 
+        onClick={() => handleReallocate(form)}
+        className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md transition-colors flex items-center"
+        disabled={submitting}
+        type="button"
+      >
+        <ArrowRight className="h-4 w-4 mr-1" />
+        Reallocate
+      </button>
+      
+      {/* Edit Request Actions - Only for Completed forms */}
       {form.status === 'Completed' && (
         <>
           {form.editRequestStatus === 'Requested' ? (
@@ -1037,21 +1060,10 @@ if (userType === 'Report') {
           )}
         </>
       )}
-      
-      {form.status === 'Allocated' && (
-        <button 
-          onClick={() => handleReallocate(form)}
-          className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md transition-colors flex items-center"
-          disabled={submitting}
-          type="button"
-        >
-          <ArrowRight className="h-4 w-4 mr-1" />
-          Reallocate
-        </button>
-      )}
     </div>
   </td>
 )}
+
       </tr>
     );
   };
@@ -1649,7 +1661,10 @@ return (
             </div>
           </div>
           <div className="p-4">
-            <IndividualFeeCommitteeForm formType={viewType} />
+          <IndividualFeeCommitteeForm 
+  formType={viewType} 
+  onFormSubmit={handleFormSubmitted} 
+/>
           </div>
         </div>
       )}

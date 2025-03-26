@@ -144,40 +144,44 @@ const downloadPDF = async () => {
           <div className="p-6">
             <div id="full-content" className="pdf-content">
               {/* Header Section */}
-              <div className="section-break">
-                <div className="flex justify-between items-start mb-4 no-break">
-                  <p className="text-sm">School Code: {schoolDetails.code}</p>
-                  <p className="text-sm">2025-2026 FORMAT</p>
-                </div>
-                
-                <div className="mb-6 no-break">
-                <p className="whitespace-pre-wrap">{schoolDetails.name}</p>
-                  <p className="whitespace-pre-wrap">{schoolDetails.address}</p>
-                </div>
-
-                <div className="text-center mb-12 no-break">
-                  <h1 className="text-xl font-bold mb-2">PROCEEDINGS OF THE TAMIL NADU PRIVATE SCHOOLS</h1>
-                  <h2 className="text-lg font-bold mb-4">FEE DETERMINATION COMMITTEE</h2>
-                  <p className="mb-4">Dated: {date}</p>
-                  <h2 className="text-center font-bold text-lg mb-8">ORDER</h2>
-                </div>
-              </div>
+              {/* Header Section */}
+<div className="section-break">
+    <div className="flex justify-end items-start mb-4 no-break">
+        <p className="text-sm">School Code: {schoolDetails.code}</p>
+    </div>
+    
+    <div className="text-center mb-12 no-break">
+        <h1 className="text-xl font-bold mb-2">PROCEEDINGS OF THE TAMIL NADU PRIVATE SCHOOLS</h1>
+        <h2 className="text-lg font-bold mb-4">FEE DETERMINATION COMMITTEE</h2>
+        <p className="mb-2">Dated: {date}</p>
+        
+        <div className="text-center">
+            <p className="mb-1">{schoolDetails.name}</p>
+            <p className="mb-4">{schoolDetails.address}</p>
+        </div>
+        
+        <h2 className="text-center font-bold text-lg mb-6">ORDER</h2>
+    </div>
+</div>  
 
               {/* Introduction Section */}
-              <div className="section-break mb-8">
-                <div className="mb-6 text-justify">
-                  <p> In the light of the Judgments of the Hon'ble High Court of Madras reported in 2012
-                      WLR.489 Lakshmi school case and the unreported judgement dated 25.01.2018 in
-                      W.P.38383 of 2015 batch the present guidelines are formulated to be borne in mind in
-                      determining the fee structure for the school.</p>
-                </div>
+              <div className="section-break mb-2">
+              <div className="mb-3 text-justify w-4/5 mx-auto">
+  <p>
+    In the light of the Judgments of the Hon'ble High Court of Madras reported in 2012
+    WLR.489 Lakshmi school case and the unreported judgement dated 25.01.2018 in
+    W.P.38383 of 2015 batch the present guidelines are formulated to be borne in mind in
+    determining the fee structure for the school.
+  </p>
+</div>
+
               </div>
 
               {/* Main Sections A-I */}
               {/* Section A */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">A. Development Fund and Surplus Fund</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break mb-20">
+                <h3 className="font-semibold mb-2 text-lg text justify w-5/6 mx-auto">A. Development Fund and Surplus Fund</h3>
+                <div className="mb-30 text-justify text-justify  w-5/6  mx-auto">
                   <p>“Development Fund” and “Surplus Fund” serve the same purpose. Tamil
 Nadu Act states that a “Reasonable Surplus” only must be provided. Concept
 of "Development Fund" was dealt with by the Hon’ble Supreme Court of India
@@ -206,9 +210,12 @@ the Madras High Court referred to above, treating “Development Fund”and
               </div>
 
               {/* Section B */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">B. Infrastructure Fund</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break -mb-1">
+              <div className="flex justify-end items-start  no-break">
+        <p className="text-sm">School Code: {schoolDetails.code}</p>
+    </div>
+                <h3 className="font-semibold mb-1 text-lg text justify w-5/6 mx-auto">B. Infrastructure Fund</h3>
+                <div className="mb-1 text-justify text justify w-5/6 mx-auto">
                   <p>Infrastructure fund to be considered in the percentage fixed by the Hon’ble
 High Court of Madras. In Para 154 of the Judgment reported in 2012 WLR 489
 the Hon’ble High Court of Madras held that for “Infrastructure Grading”, there
@@ -223,17 +230,17 @@ to allow “Infrastructure Fund” at 9% commencing from the academic year
               </div>
 
               {/* Section C */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">C. Internet Consideration</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break mb-1">
+                <h3 className="font-semibold mb-1 text-lg text justify w-5/6 mx-auto">C. Internet Consideration</h3>
+                <div className="mb-1 text-justify text justify w-5/6 mx-auto">
                   <p>Internet to be considered on production of relevant documentary proof.</p>
                 </div>
               </div>
 
               {/* Section D */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">D. Examination Expenses</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break mb-20">
+                <h3 className="font-semibold mb-1 text-lg text justify w-5/6 mx-auto">D. Examination Expenses</h3>
+                <div className="mb-2 text-justify text justify w-5/6 mx-auto">
                   <p>This again depends upon the strength of the school. All the students do
 not take Board Examinations. It is common knowledge that students from
 10th to 12th standard alone appear for Board Examinations. For appearing in
@@ -268,9 +275,12 @@ case to case basis and the expenditure claimed under this head is arrived, at
               </div>
 
               {/* Section E */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">E. Claims Not Considered</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break mb-10">
+              <div className="flex justify-end items-start  no-break">
+        <p className="text-sm">School Code: {schoolDetails.code}</p>
+    </div>
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">E. Claims Not Considered</h3>
+                <div className="mb-6 text-justify text justify w-5/6 mx-auto">
                   <p>Claims under “Christmas gift”, “staff pension”, “incentive for good results”,
 “retirement purse”, “ex-gratia”, “workers uniform”, “staff uniform”, “staff
 welfare” and “staff insurance” will not be considered, based on the Division
@@ -299,9 +309,9 @@ the claims referred to in this paragraph.</p>
               </div>
 
               {/* Section F */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">F. Printing and Other Charges</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break mb-40">
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">F. Printing and Other Charges</h3>
+                <div className="mb-6 text-justify text justify w-5/6 mx-auto">
                   <p>The claims under “Printing charges”, “Stationery Charges”, “ Books and
 Periodicals”, “Teaching Aids”, “Sports and Games”, “ Group Activities”,
 “Seminar”, “Teaching Through Technology” and “Functions and Celebrations”
@@ -312,9 +322,12 @@ account whether the amount determined is reasonable or not.</p>
               </div>
 
               {/* Section G */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">G. Extra-Curricular Activities</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break -mb-2">
+              <div className="flex justify-end items-start  no-break">
+        <p className="text-sm">School Code: {schoolDetails.code}</p>
+    </div>
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">G. Extra-Curricular Activities</h3>
+                <div className="mb-6 text-justify text justify w-5/6 mx-auto">
                   <p>Generally this claim will not be considered because these activities are
 only optional. It is common knowledge that all the students do not take part
 in “Extra Curricular Activities”. Therefore expenses incurred under the above
@@ -335,8 +348,8 @@ these activities.</p>
 
               {/* Section H */}
               <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">H. Functions and Celebrations</h3>
-                <div className="mb-6 text-justify">
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">H. Functions and Celebrations</h3>
+                <div className="mb-6 text-justify text justify w-5/6 mx-auto">
                   <p>Any claim made under this head will be decided on a case to case basis.
 The amounts claimed shall be supported by reliable documents. It is seen that
 the expenditures shown to have been incurred vary from school to school and
@@ -350,8 +363,8 @@ school is entitled to only on a reasonable basis.</p>
 
               {/* Section I */}
               <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">I. Educational Tour</h3>
-                <div className="mb-6 text-justify">
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">I. Educational Tour</h3>
+                <div className="mb-6 text-justify text justify w-5/6 mx-auto">
                   <p>For conducting a local tour which may be once in a year the expenses may
 be negligible and therefore the school can bear it. For outstation tour the
 school always collects in advance a fixed sum from each student to meet the
@@ -362,9 +375,9 @@ will not be considered.</p>
 
               {/* Numbered Sections 2-9 */}
               {/* Section 2 */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">2. Development Fund and Other Expenses</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break mb-20">
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">2. Development Fund and Other Expenses</h3>
+                <div className="mb- text-justify text justify w-5/6 mx-auto">
                   <p>The amount quantified and determined under the heads of “Development Fund”,
 “Infrastructure Fund” and “Sundry Expenses” if taken as a whole would be more than
 sufficient, in the opinion of the Committee to meet all the other expenses which are
@@ -373,9 +386,12 @@ not taken into account by this Order.</p>
               </div>
 
               {/* Section 3 */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">3. Drivers and Conductors Salary</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break -mb-2">
+              <div className="flex justify-end items-start  no-break">
+        <p className="text-sm">School Code: {schoolDetails.code}</p>
+    </div>
+                <h3 className="font-semibold mb-5 text-lg text justify w-5/6 mx-auto">3. Drivers and Conductors Salary</h3>
+                <div className="mb-20 text-justify text justify w-5/6 mx-auto">
                   <p>Almost every school treats the above category of person as Non-teaching staff
 and claims that the salary paid to them should be taken into account in determining
 the fee structure. Several years before, then Committee in office decided and
@@ -390,9 +406,9 @@ facility and collect it.</p>
               </div>
 
               {/* Section 4 */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">4. Text Books and Note Books</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break mb-20">
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">4. Text Books and Note Books</h3>
+                <div className="mb-6 text-justify text justify w-5/6 mx-auto">
                   <p>All the schools include the expenses in the purchase of text books and note
 books to be taken into account as a component in determining the fee structure. The
 reason given by them is that the expenses in purchasing the above is met by the
@@ -412,11 +428,15 @@ made clear that the fee structure determined will not include the cost of text b
 and note books to be given to the students.</p>
                 </div>
               </div>
+              <div className="section-break p-20"></div>
 
               {/* Section 5 */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">5. Laboratory Expenses</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break -mb-2">
+              <div className="flex justify-end items-start  no-break">
+        <p className="text-sm">School Code: {schoolDetails.code}</p>
+    </div>
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">5. Laboratory Expenses</h3>
+                <div className="mb-6 text-justify text justify w-5/6 mx-auto">
                   <p>Again it is seen that students from 10th to 12th standards alone use
 laboratories. The cost of materials to be used in laboratory is very high. These
 expenses in the opinion of the Committee cannot be taken as a component in
@@ -427,11 +447,12 @@ students. However the total expenditures incurred under this head must be suppor
 by a certificate to be issued by the Principal of the school that the expenses incurred as laboratory expenses are reasonable.</p>
                 </div>
               </div>
+              <div className="p-10"></div>
 
               {/* Section 6 */}
               <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">6. Expenditure Claims</h3>
-                <div className="mb-6 text-justify">
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">6. Expenditure Claims</h3>
+                <div className="mb-6 text-justify text justify w-5/6 mx-auto">
                   <p>In Para 21 in the unreported judgement dated 25.01.2018 in WP.No.38383/2015
 batch, the Hon’ble High Court of Madras had indicated various heads of expenditure
 that could be claimed by any school while submitting application proposing a new fee
@@ -452,11 +473,15 @@ structure. In view of the Law laid down as referred to above the claim falling u
 Account V is rejected.</p>
                 </div>
               </div>
+              <div className="p-20"></div>
 
               {/* Section 7 */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">7. Fee Structure Determination Guidelines</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break -mb-2">
+              <div className="flex justify-end items-start  no-break">
+        <p className="text-sm">School Code: {schoolDetails.code}</p>
+    </div>
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">7. Fee Structure Determination Guidelines</h3>
+                <div className="mb-6 text-justify text justify w-5/6 mx-auto">
                   <p>In determining the fee structure a huge amount quantified under “Development
 Fund” and “Infrastructure Fund” is taken into account as a component in fixing the fee
 structure. Such quantification in almost all the cases exceeds several lakhs. Many
@@ -478,48 +503,49 @@ decided that henceforth to adopt the following guidelines:</p>
 
               {/* Section 8 */}
               <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">8. Additional Claims</h3>
-                <div className="mb-6 text-justify">
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">8. Additional Claims</h3>
+                <div className="mb-6 text-justify text justify w-5/6 mx-auto">
                   <p>Any other claim not covered under any of the claims mentioned above will be
                   considered on merits subject to proof, relevancy and reasonableness.</p>
                 </div>
               </div>
 
               {/* Section 9 */}
-              <div className="section-break mb-8">
-                <h3 className="font-semibold mb-4 text-lg">9. Fee Structure Determination</h3>
-                <div className="mb-6 text-justify">
+              <div className="section-break mb-40">
+                <h3 className="font-semibold mb-4 text-lg text justify w-5/6 mx-auto">9. Fee Structure Determination</h3>
+                <div className="mb-6 text-justify text justify w-5/6 mx-auto">
                   <p>Consequently, in the light of the facts noted above, the Committee determine the
                   fee structure for the school as hereunder;</p>
                 </div>
               </div>
+              <div className="p-20"></div>
 
               {/* Account Format Tables */}
-              <div className="account-sections">
-                <div className="account-section">
-                  <AccountOneFormat />
-                </div>
-                <div className="account-section">
-                  <AccountTwoFormat />
-                </div>
-                <div className="account-section">
-                  <AccountThreeFormat />
-                </div>
-                <div className="account-section">
-                  <AccountFourFormat />
-                </div>
-                <div className="account-section">
-                  <AccountFiveFormat />
-                </div>
-                <div className="account-section -mt-40">
-                  <AccountSixFormat />
-                </div>
-                <div className="account-section">
-                  <AccountSevenFormat />
-                </div>
-                <p>10. The School in question is directed to have this order affixed on the notice board
+              <div className="account-sections text justify w-6/7 mx-auto">
+  <div className="account-section mb-8">
+    <AccountOneFormat schoolDetails={schoolDetails} />
+  </div>
+  <div className="account-section mb-16">
+    <AccountTwoFormat schoolDetails={schoolDetails} />
+  </div>
+  <div className="account-section">
+    <AccountThreeFormat schoolDetails={schoolDetails} />
+  </div>
+  <div className="account-section">
+    <AccountFourFormat schoolDetails={schoolDetails} />
+  </div>
+  <div className="account-section">
+    <AccountFiveFormat schoolDetails={schoolDetails} />
+  </div>
+  <div className="account-section -mt-40">
+    <AccountSixFormat schoolDetails={schoolDetails} />
+  </div>
+  <div className="account-section mb-16">
+    <AccountSevenFormat schoolDetails={schoolDetails} />
+  </div>
+                <p >10. The School in question is directed to have this order affixed on the notice board
                 of the school for the information of the students and parents etc.,</p>
-                <div className="signature-section mt-24">
+                <div className="signature-section mt-24 p-10">
                   <SignatureSection />
                 </div>
               </div>

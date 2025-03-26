@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/api';
 
-const AccountTwoFormat = () => {
+const AccountTwoFormat = ({schoolDetails}) => {
   const [formData, setFormData] = useState(null);
 
   useEffect(() => {
@@ -32,24 +32,34 @@ const AccountTwoFormat = () => {
     fetchData();
   }, []);
 
+  const TableHeader = () => (
+    <thead>
+      <tr>
+        <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '20%'}}>HEAD OF EXPENDITURE</th>
+        <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '25%'}}>Expenditure of the previous Academic Year</th>
+        <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '20%'}}>Allowed</th>
+        <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '35%'}}>
+          <div className="break-words">If not allowed/reduced-Reason</div>
+        </th>
+      </tr>
+    </thead>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-50 p-6">
+ 
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow p-6">
+      <div className="flex justify-end items-start -mb-4">
+          <p className="text-sm">School Code: {schoolDetails?.code || ''}</p>
+        </div>
         <h2 className="text-center font-bold text-lg mb-6">Account II - Administration</h2>
      
         
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-300 table-fixed">
-            <thead>
-              <tr>
-                <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '20%'}}>HEAD OF EXPENDITURE</th>
-                <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '25%'}}>Expenditure of the previous Academic Year</th>
-                <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '20%'}}>Allowed</th>
-                <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '35%'}}>
-                  <div className="break-words">If not allowed/reduced-Reason</div>
-                </th>
-              </tr>
-            </thead>
+        {/* First Table */}
+        <div className="overflow-x-auto mb-8">
+          <h3 className="font-semibold mb-4">Account II A</h3>
+          <table className="w-full border-collapse border border-gray-300 table-fixed mb-64">
+            <TableHeader />
             <tbody>
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
@@ -65,7 +75,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2ElectricityChargesReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Fuel for Generator</div>
@@ -80,7 +89,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2FuelForGeneratorReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Water Taxes & Water Charges</div>
@@ -95,7 +103,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2WaterTaxesReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Property Taxes</div>
@@ -110,7 +117,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2PropertyTaxesReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Telephone & Mobile (Administrative Purpose)</div>
@@ -125,7 +131,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2TelephoneReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Internet and SMS (Administrative Purpose)</div>
@@ -140,7 +145,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2InternetReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Postage</div>
@@ -155,7 +159,16 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2PostageReason || ''}</div>
                 </td>
               </tr>
+            </tbody>
+          </table>
+        </div>
 
+        {/* Second Table */}
+        <div className="overflow-x-auto mb-24">
+          <h3 className="font-semibold mb-4">Account II B</h3>
+          <table className="w-full border-collapse border border-gray-300 table-fixed mb-56">
+            <TableHeader />
+            <tbody>
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Printing (Printing of Cash Books, Ledgers, Registers, Application, Magazines and Circulars etc.)</div>
@@ -170,7 +183,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2PrintingReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Stationery</div>
@@ -185,7 +197,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2StationeryReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Examination Expenses</div>
@@ -200,7 +211,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2ExaminationReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Books and periodicals (Library)</div>
@@ -215,7 +225,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2BooksReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Teaching Aids</div>
@@ -230,7 +239,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2TeachingAidsReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Sports and Games</div>
@@ -245,7 +253,16 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2SportsGamesReason || ''}</div>
                 </td>
               </tr>
+            </tbody>
+          </table>
+        </div>
 
+{/* Third Table */}
+<div className="overflow-x-auto mb-2">
+          <h3 className="font-semibold mb-2">Account II C</h3>
+          <table className="w-full border-collapse border border-gray-300 table-fixed mb-2">
+            <TableHeader />
+            <tbody>
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Staff Welfare</div>
@@ -260,7 +277,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2StaffWelfareReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Special Training and Workshop for the skill development of the child</div>
@@ -275,10 +291,9 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2SpecialTrainingReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
-                <div className="break-words">Recognition Expenses and any other Statutory Payments</div>
+                  <div className="break-words">Recognition Expenses and any other Statutory Payments</div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {formData?.account2RecognitionExpensesExpenditure || 0}
@@ -290,7 +305,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2RecognitionExpensesReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Administrative Travel and Vehicle Expenses</div>
@@ -305,7 +319,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2AdministrativeTravelReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Professional Fee (Legal, Audit etc) Administration</div>
@@ -320,7 +333,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2ProfessionalFeeReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Hospitality</div>
@@ -335,7 +347,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2HospitalityReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Functions and Celebrations</div>
@@ -350,7 +361,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2FunctionsReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="break-words">Advertisement for Recruitment of Teachers</div>
@@ -365,7 +375,6 @@ const AccountTwoFormat = () => {
                   <div className="break-words whitespace-normal">{formData?.account2AdvertisementForTeacherRecruitmentReason || ''}</div>
                 </td>
               </tr>
-
               <tr>
                 <td className="border border-gray-300 px-4 py-2 font-semibold">Total</td>
                 <td className="border border-gray-300 px-4 py-2 text-center font-semibold">

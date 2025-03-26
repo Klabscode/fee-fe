@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/api';
 
-const AccountFourFormat = () => {
+const AccountFourFormat = ({schoolDetails}) => {
   const [formData, setFormData] = useState(null);
 
   useEffect(() => {
@@ -38,12 +38,15 @@ const AccountFourFormat = () => {
   const numberCellClasses = "border border-gray-300 px-4 py-2 text-center";
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-50 p-6">
+        <div className="flex justify-end items-start mb-4">
+          <p className="text-sm">School Code: {schoolDetails?.code || ''}</p>
+        </div>
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow p-6">
         <h2 className="text-center font-bold text-lg mb-6">Account IV - Maintenance</h2>
  
         
-        <div className="mb-6">
+        <div className="mb-24">
           <h3 className="font-semibold mb-4">a) Campus Maintenance</h3>
           <div className="overflow-x-auto">
             <table className={tableClasses}>
@@ -93,7 +96,7 @@ const AccountFourFormat = () => {
           </div>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-48">
           <h3 className="font-semibold mb-4">b) Laboratory Maintenance</h3>
           <div className="overflow-x-auto">
             <table className={tableClasses}>
@@ -143,9 +146,9 @@ const AccountFourFormat = () => {
           </div>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-4">
           <h3 className="font-semibold mb-4">c) Equipment Maintenance</h3>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto ">
             <table className={tableClasses}>
               <thead>
                 <tr>

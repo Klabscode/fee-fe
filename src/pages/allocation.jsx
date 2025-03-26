@@ -109,7 +109,7 @@ const AllocationForm = () => {
       
       if (allSucceeded) {
         setSuccess(true);
-        setTimeout(() => navigate('/home'), 2000);
+        setTimeout(() => navigate('/forms'), 2000);
       } else {
         if (failedCount === selectedForms.length) {
           setError('Failed to allocate any forms. Please try again.');
