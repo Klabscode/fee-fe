@@ -260,11 +260,17 @@ const ApprovalFormat = () => {
             <p style="text-align: justify; margin-bottom: 10px;font-size: 20px;">(b) "After the receipt of the proposal from the concerned Institution, the Committee has to verify as to whether the fee proposed by the Private School is Justified and it does not amount to profiteering or charging of exorbitant fee"</p>
             <p style="text-align: justify; margin-bottom: 10px;font-size: 20px;">(c) "In case the Committee is of the view that the fee structure proposed by the institution appears to be correct, taking note of the various facilities provided and that there was no profiteering or collection of exorbitant fee under the guise of capitation fee, it has to approve the fee structure"</p>
           </div>
+          
           <p style="text-align: justify;font-size: 20px;">2. The Committee examined the application along with the records submitted with due care and caution. On such examination the Committee is satisfied that the fee structure submitted by the school does not amount to profiteering or charging exorbitant fee. Therefore the committee is approving and determining the fee structure as proposed by the school</p>
         </div>
    
         <div style="margin-bottom: 450px;">
+         <div style="text-align: right; margin-bottom: 10px;">
+          <p style="margin: 0;">School Code: ${schoolDetails.code}</p>
+         
+        </div>
           <h3 style="margin-bottom: 15px; font-size: 16px;">Fee structure for 2025-26 (Approval)</h3>
+          
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 370px;">
             <tr style="background-color: #f3f4f6;">
               <th style="border: 1px solid #000; padding: 8px; text-align: center;">Class</th>
@@ -279,6 +285,10 @@ const ApprovalFormat = () => {
               </tr>
             `).join('')}
           </table>
+           <div style="text-align: right; margin-bottom: 10px;">
+          <p style="margin: 0;">School Code: ${schoolDetails.code}</p>
+         
+        </div>
    
           <h3 style="margin-bottom: 15px; font-size: 16px;">Fee Structure for 2025-26 & 2026-27</h3>
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
@@ -296,8 +306,10 @@ const ApprovalFormat = () => {
             `).join('')}
           </table>
         </div>
+        
    
         <div style="margin-bottom: 2px; page-break-inside: avoid;">
+        
           <p style="text-align: justify; margin-bottom: 80px;">
             3. The School in question is directed to have this order affixed on the notice board of 
             the school for the information of the students and parents etc.,

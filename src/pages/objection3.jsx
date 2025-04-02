@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import api from '../api/api';
+import React, { useState, useEffect } from "react";
+import api from "../api/api";
 
-const AccountThreeFormat = ({schoolDetails}) => {
+const AccountThreeFormat = ({ schoolDetails }) => {
   const [formData, setFormData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const feeFormId = localStorage.getItem('feeFormId');
-        const loginResponse = JSON.parse(localStorage.getItem('loginResponse') || '{}');
+        const feeFormId = localStorage.getItem("feeFormId");
+        const loginResponse = JSON.parse(
+          localStorage.getItem("loginResponse") || "{}"
+        );
         const allocatedTo = loginResponse?.output?.data?.id;
 
         const headers = {
-          'Authorization': loginResponse?.output?.token,
-          'Content-Type': 'application/json'
+          Authorization: loginResponse?.output?.token,
+          "Content-Type": "application/json",
         };
 
         const response = await api.get(
@@ -25,7 +27,7 @@ const AccountThreeFormat = ({schoolDetails}) => {
           setFormData(response.data.results);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -34,29 +36,52 @@ const AccountThreeFormat = ({schoolDetails}) => {
 
   return (
     <div className="min-h-screen bg-gray-50 ">
-        <div className="flex justify-end items-start mb-4">
-          <p className="text-sm">School Code: {schoolDetails?.code || ''}</p>
-        </div>
+      <div className="flex justify-end items-start">
+        <p className="text-sm">School Code: {schoolDetails?.code || ""}</p>
+      </div>
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow ">
-        <h2 className="text-center font-bold text-lg mb-6">Account III - Expenses on Specific Purposes</h2>
-      
-        
+        <h2 className="text-center font-bold text-lg mb-2">
+          Account III - Expenses on Specific Purposes
+        </h2>
+
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300 table-fixed">
             <thead>
               <tr>
-                <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '20%'}}>HEAD OF EXPENDITURE</th>
-                <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '25%'}}>Expenditure</th>
-                <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '20%'}}>Allowed</th>
-                <th className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50" style={{width: '35%'}}>
-                  <div className="break-words">If not allowed/reduced-Reason</div>
+                <th
+                  className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50"
+                  style={{ width: "20%" }}
+                >
+                  HEAD OF EXPENDITURE
+                </th>
+                <th
+                  className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50"
+                  style={{ width: "25%" }}
+                >
+                  Expenditure
+                </th>
+                <th
+                  className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50"
+                  style={{ width: "20%" }}
+                >
+                  Allowed
+                </th>
+                <th
+                  className="border border-gray-300 px-4 py-2 font-semibold bg-gray-50"
+                  style={{ width: "35%" }}
+                >
+                  <div className="break-words">
+                    If not allowed/reduced-Reason
+                  </div>
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words">Educational Tour only for students</div>
+                  <div className="break-words">
+                    Educational Tour only for students
+                  </div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {formData?.account3EducationTourExpenditure || 0}
@@ -65,13 +90,17 @@ const AccountThreeFormat = ({schoolDetails}) => {
                   {formData?.account3EducationTourAllowed || 0}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words whitespace-normal">{formData?.account3EducationTourReason || ''}</div>
+                  <div className="break-words whitespace-normal">
+                    {formData?.account3EducationTourReason || ""}
+                  </div>
                 </td>
               </tr>
 
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words">Seminar or orientation programme for students</div>
+                  <div className="break-words">
+                    Seminar or orientation programme for students
+                  </div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {formData?.account3SeminarExpenditure || 0}
@@ -80,13 +109,17 @@ const AccountThreeFormat = ({schoolDetails}) => {
                   {formData?.account3SeminarAllowed || 0}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words whitespace-normal">{formData?.account3SeminarReason || ''}</div>
+                  <div className="break-words whitespace-normal">
+                    {formData?.account3SeminarReason || ""}
+                  </div>
                 </td>
               </tr>
 
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words">Group Activities (NCC/NSS/Scouts/JRC/RSO) and camps</div>
+                  <div className="break-words">
+                    Group Activities (NCC/NSS/Scouts/JRC/RSO) and camps
+                  </div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {formData?.account3GroupActivitiesExpenditure || 0}
@@ -95,7 +128,9 @@ const AccountThreeFormat = ({schoolDetails}) => {
                   {formData?.account3GroupActivitiesAllowed || 0}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words whitespace-normal">{formData?.account3GroupActivitiesReason || ''}</div>
+                  <div className="break-words whitespace-normal">
+                    {formData?.account3GroupActivitiesReason || ""}
+                  </div>
                 </td>
               </tr>
 
@@ -110,13 +145,18 @@ const AccountThreeFormat = ({schoolDetails}) => {
                   {formData?.account3MedicalExpensesAllowed || 0}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words whitespace-normal">{formData?.account3MedicalExpensesReason || ''}</div>
+                  <div className="break-words whitespace-normal">
+                    {formData?.account3MedicalExpensesReason || ""}
+                  </div>
                 </td>
               </tr>
 
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words">Teaching through Technology (Smart class or any other modern technology)</div>
+                  <div className="break-words">
+                    Teaching through Technology (Smart class or any other modern
+                    technology)
+                  </div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {formData?.account3TeachingThroughTechnologyExpenditure || 0}
@@ -125,13 +165,17 @@ const AccountThreeFormat = ({schoolDetails}) => {
                   {formData?.account3TeachingThroughTechnologyAllowed || 0}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words whitespace-normal">{formData?.account3TeachingThroughTechnologyReason || ''}</div>
+                  <div className="break-words whitespace-normal">
+                    {formData?.account3TeachingThroughTechnologyReason || ""}
+                  </div>
                 </td>
               </tr>
 
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words">Co-Curricular Activities connected with curriculum for all</div>
+                  <div className="break-words">
+                    Co-Curricular Activities connected with curriculum for all
+                  </div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {formData?.account3CoCurricularExpenditure || 0}
@@ -140,13 +184,17 @@ const AccountThreeFormat = ({schoolDetails}) => {
                   {formData?.account3CoCurricularAllowed || 0}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words whitespace-normal">{formData?.account3CoCurricularReason || ''}</div>
+                  <div className="break-words whitespace-normal">
+                    {formData?.account3CoCurricularReason || ""}
+                  </div>
                 </td>
               </tr>
 
               <tr>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words">Extra-Curricular Activities for all</div>
+                  <div className="break-words">
+                    Extra-Curricular Activities for all
+                  </div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {formData?.account3ExtraCurricularExpenditure || 0}
@@ -155,12 +203,16 @@ const AccountThreeFormat = ({schoolDetails}) => {
                   {formData?.account3ExtraCurricularAllowed || 0}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="break-words whitespace-normal">{formData?.account3ExtraCurricularReason || ''}</div>
+                  <div className="break-words whitespace-normal">
+                    {formData?.account3ExtraCurricularReason || ""}
+                  </div>
                 </td>
               </tr>
 
               <tr>
-                <td className="border border-gray-300 px-4 py-2 font-semibold">Total</td>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">
+                  Total
+                </td>
                 <td className="border border-gray-300 px-4 py-2 text-center font-semibold">
                   {formData?.account3TotalExpenditure || 0}
                 </td>

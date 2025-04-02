@@ -118,6 +118,9 @@ const AccountSevenFormat = ({schoolDetails}) => {
 
         {/* Fee Structure 2025-26 & 2026-27 */}
         <div className="mb-80">
+        <div className="flex justify-end items-start -mb-2">
+          <p className="text-sm">School Code: {schoolDetails?.code || ''}</p>
+        </div>
           <h3 className="font-semibold mb-4">Fee Structure for 2025-26 & 2026-27</h3>
           <div className="overflow-x-auto">
             <table className={tableClasses}>

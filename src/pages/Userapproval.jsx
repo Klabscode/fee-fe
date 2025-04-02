@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, AlertCircle, LogOut } from 'lucide-react';
+import { Check, X, AlertCircle, LogOut, RefreshCw, Key } from 'lucide-react';
 import api from '../api/api';
 
 const UserApprovalPage = () => {
   const [pendingUsers, setPendingUsers] = useState([]);
   const [activeUsers, setActiveUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLogoutLoading, setIsLogoutLoading] = useState(false);
+  const [isResetPasswordLoading, setIsResetPasswordLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  
+  // Password reset modal state
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetUser, setResetUser] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
 
   // Check if logged in user is Admin
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -57,7 +64,7 @@ const UserApprovalPage = () => {
       const loginResponse = JSON.parse(localStorage.getItem('loginResponse') || '{}');
       const token = loginResponse?.output?.token;
       
-      // Fetch all active users
+      // Fetch all users
       const response = await api.get('/getAllUsers', {
         headers: {
           'Authorization': token
@@ -65,7 +72,10 @@ const UserApprovalPage = () => {
       });
       
       if (response.data && response.data.results) {
-        // Get all active users (with status 'approved')
+        // Store all users
+        setAllUsers(response.data.results);
+        
+        // Get active users (with status 'approved')
         const approvedUsers = response.data.results.filter(
           user => user.status === 'approved'
         );
@@ -159,6 +169,102 @@ const UserApprovalPage = () => {
     }
   };
 
+  const openResetPasswordModal = (user) => {
+    setResetUser(user);
+    setNewPassword('');
+    setShowResetModal(true);
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetUser || !newPassword) {
+      setError('User and new password are required');
+      return;
+    }
+
+    try {
+      setIsResetPasswordLoading(true);
+      
+      // Get authentication token from localStorage
+      const loginResponse = JSON.parse(localStorage.getItem('loginResponse') || '{}');
+      const token = loginResponse?.output?.token;
+      
+      // Call the password reset API
+      await api.post('/resetPassword', 
+        {
+          userId: resetUser.id,
+          newPassword
+        },
+        {
+          headers: {
+            'Authorization': token
+          }
+        }
+      );
+      
+      // Close the modal and clear form
+      setShowResetModal(false);
+      setNewPassword('');
+      setResetUser(null);
+      
+      setSuccessMessage(`Password for ${resetUser.userName} has been reset successfully.`);
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Failed to reset password:', err);
+      setError('Failed to reset password. Please try again.');
+      
+      // Clear error message after 3 seconds
+      setTimeout(() => setError(''), 3000);
+    } finally {
+      setIsResetPasswordLoading(false);
+    }
+  };
+
+  const handleBackup = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Get authentication token from localStorage
+      const loginResponse = JSON.parse(localStorage.getItem('loginResponse') || '{}');
+      const token = loginResponse?.output?.token;
+      
+      // Call the backup API endpoint with the token
+      await api.post('/backup_data', 
+        {},
+        {
+          headers: {
+            'Authorization': token
+          }
+        }
+      );
+      
+      setSuccessMessage('System backup completed successfully.');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Failed to backup data:', err);
+      setError('Failed to backup data. Please try again.');
+      
+      // Clear error message after 3 seconds
+      setTimeout(() => setError(''), 3000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Generate a random strong password
+  const generatePassword = () => {
+    const length = 12;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    setNewPassword(password);
+  };
+
   // Format date string to a more readable format
   const formatDate = (dateString) => {
     if (!dateString) return 'Never';
@@ -175,9 +281,18 @@ const UserApprovalPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">User Management</h1>
-        <p className="text-gray-600">Manage user access and pending registration requests</p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">User Management</h1>
+          <p className="text-gray-600">Manage user access and pending registration requests</p>
+        </div>
+        <button
+          onClick={handleBackup}
+          disabled={isLoading}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center"
+        >
+          {isLoading ? 'Processing...' : 'Backup'}
+        </button>
       </div>
 
       {/* Success/Error Messages */}
@@ -193,17 +308,17 @@ const UserApprovalPage = () => {
         </div>
       )}
 
-      {/* Active Users Section */}
+      {/* All Users Section */}
       <div className="mb-10">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Active Users</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">All Users</h2>
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           {isLoading ? (
             <div className="p-8 text-center">
-              <p className="text-gray-500">Loading active users...</p>
+              <p className="text-gray-500">Loading users...</p>
             </div>
-          ) : activeUsers.length === 0 ? (
+          ) : allUsers.length === 0 ? (
             <div className="p-8 text-center">
-              <p className="text-gray-500">No active users found.</p>
+              <p className="text-gray-500">No users found.</p>
             </div>
           ) : (
             <table className="min-w-full divide-y divide-gray-200">
@@ -216,6 +331,9 @@ const UserApprovalPage = () => {
                     User Type
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Last Login
                   </th>
                   <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -224,8 +342,8 @@ const UserApprovalPage = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {activeUsers.map((user) => (
-                  <tr key={user.id}>
+                {allUsers.map((user) => (
+                  <tr key={user.id} className={user.status === 'pending' ? 'bg-yellow-50' : ''}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{user.userName}</div>
                     </td>
@@ -235,17 +353,62 @@ const UserApprovalPage = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      {user.status === 'approved' ? (
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          Approved
+                        </span>
+                      ) : user.status === 'pending' ? (
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                          Pending
+                        </span>
+                      ) : (
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                          Rejected
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">{formatDate(user.lastLoginDate)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
-                        onClick={() => handleForceLogout(user.id, user.userName)}
-                        className="text-red-600 hover:text-red-900 flex items-center justify-end"
-                        disabled={isLogoutLoading}
+                        onClick={() => openResetPasswordModal(user)}
+                        className="text-indigo-600 hover:text-indigo-900 mr-4 inline-flex items-center"
+                        disabled={isLoading}
                       >
-                        <LogOut className="h-4 w-4 mr-1" />
-                        Force Logout
+                        <Key className="h-4 w-4 mr-1" />
+                        Reset Password
                       </button>
+                      {user.status === 'approved' && (
+                        <button
+                          onClick={() => handleForceLogout(user.id, user.userName)}
+                          className="text-red-600 hover:text-red-900 inline-flex items-center"
+                          disabled={isLogoutLoading}
+                        >
+                          <LogOut className="h-4 w-4 mr-1" />
+                          Force Logout
+                        </button>
+                      )}
+                      {user.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => handleStatusUpdate(user.id, 'approved')}
+                            className="text-green-600 hover:text-green-900 mr-4 inline-flex items-center"
+                            disabled={isLoading}
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleStatusUpdate(user.id, 'rejected')}
+                            className="text-red-600 hover:text-red-900 inline-flex items-center"
+                            disabled={isLoading}
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Reject
+                          </button>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -255,83 +418,60 @@ const UserApprovalPage = () => {
         </div>
       </div>
 
-      {/* Pending Users Section */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Pending Approval Requests</h2>
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          {isLoading ? (
-            <div className="p-8 text-center">
-              <p className="text-gray-500">Loading pending users...</p>
-            </div>
-          ) : pendingUsers.length === 0 ? (
-            <div className="p-8 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                <AlertCircle className="h-8 w-8 text-gray-400" />
+      {/* Reset Password Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black opacity-50"></div>
+          <div className="bg-white p-6 rounded-lg shadow-lg z-10 w-96">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Reset Password</h3>
+            <p className="text-gray-600 mb-4">
+              Reset password for user: <span className="font-semibold">{resetUser?.userName}</span>
+            </p>
+            
+            <div className="mb-4">
+              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                New Password
+              </label>
+              <div className="flex">
+                <input
+                  type="text"
+                  id="newPassword"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Enter new password"
+                />
+                <button
+                  type="button"
+                  onClick={generatePassword}
+                  className="ml-2 p-2 bg-gray-200 rounded-md hover:bg-gray-300"
+                  title="Generate random password"
+                >
+                  <RefreshCw className="h-5 w-5 text-gray-700" />
+                </button>
               </div>
-              <p className="text-gray-500 font-medium">No pending user requests</p>
-              <p className="text-gray-400 text-sm mt-1">All user requests have been processed.</p>
             </div>
-          ) : (
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Username
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    User Type
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Last Login
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {pendingUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{user.userName}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {user.userType}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">{formatDate(user.lastLoginDate)}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => handleStatusUpdate(user.id, 'approved')}
-                        className="text-green-600 hover:text-green-900 mr-4"
-                        disabled={isLoading}
-                      >
-                        <span className="flex items-center">
-                          <Check className="h-4 w-4 mr-1" />
-                          Approve
-                        </span>
-                      </button>
-                      <button
-                        onClick={() => handleStatusUpdate(user.id, 'rejected')}
-                        className="text-red-600 hover:text-red-900"
-                        disabled={isLoading}
-                      >
-                        <span className="flex items-center">
-                          <X className="h-4 w-4 mr-1" />
-                          Reject
-                        </span>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => setShowResetModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleResetPassword}
+                disabled={isResetPasswordLoading || !newPassword}
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+              >
+                {isResetPasswordLoading ? 'Resetting...' : 'Reset Password'}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

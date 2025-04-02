@@ -753,22 +753,46 @@ const IndividualFeeCommitteeForm = ({ formType = 'Individual', initialData = nul
       <input type="email" value={formData.emailId} onChange={(e) => setFormData({...formData, emailId: e.target.value})} className="w-full px-3 py-2 rounded border border-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"/>
     </div>
     <div className="md:col-span-2">
-      <label className="block text-sm font-medium text-gray-700 mb-1">CLASSES FUNCTIONING</label>
-      <input type="text" value={formData.classesFunctioning} onChange={(e) => setFormData({...formData, classesFunctioning: e.target.value})} className="w-full px-3 py-2 rounded border border-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"/>
+  <label className="block text-sm font-medium text-gray-700 mb-1">CLASSES FUNCTIONING</label>
+  <input 
+    type="text" 
+    value={formData.classesFunctioning} 
+    onChange={(e) => setFormData({...formData, classesFunctioning: e.target.value.toUpperCase()})} 
+    className="w-full px-3 py-2 rounded border border-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+    style={{textTransform: 'uppercase'}}
+  />
+</div>
+<div className="md:col-span-2">
+  <label className="block text-sm font-medium text-gray-700 mb-1">PREVIOUS FEE COMMITTEE ORDER VALIDITY YEAR</label>
+  <div className="flex items-center space-x-4">
+    <div className="flex-1">
+      <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
+      <select 
+        value={formData.previousFeeValidityYear.from} 
+        onChange={(e) => setFormData({...formData, previousFeeValidityYear: {...formData.previousFeeValidityYear, from: e.target.value}})} 
+        className="w-full px-3 py-2 rounded border border-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+      >
+        <option value="">Select Year</option>
+        {Array.from({length: 16}, (_, i) => 2015 + i).map(year => (
+          <option key={`from-${year}`} value={year}>{year}</option>
+        ))}
+      </select>
     </div>
-    <div className="md:col-span-2">
-      <label className="block text-sm font-medium text-gray-700 mb-1">PREVIOUS FEE COMMITTEE ORDER VALIDITY YEAR</label>
-      <div className="flex items-center space-x-4">
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
-          <input type="number" value={formData.previousFeeValidityYear.from} onChange={(e) => setFormData({...formData, previousFeeValidityYear: {...formData.previousFeeValidityYear, from: e.target.value}})} className="w-full px-3 py-2 rounded border border-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"/>
-        </div>
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
-          <input type="number" value={formData.previousFeeValidityYear.to} onChange={(e) => setFormData({...formData, previousFeeValidityYear: {...formData.previousFeeValidityYear, to: e.target.value}})} className="w-full px-3 py-2 rounded border border-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"/>
-        </div>
-      </div>
+    <div className="flex-1">
+      <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+      <select 
+        value={formData.previousFeeValidityYear.to} 
+        onChange={(e) => setFormData({...formData, previousFeeValidityYear: {...formData.previousFeeValidityYear, to: e.target.value}})} 
+        className="w-full px-3 py-2 rounded border border-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+      >
+        <option value="">Select Year</option>
+        {Array.from({length: 16}, (_, i) => 2015 + i).map(year => (
+          <option key={`to-${year}`} value={year}>{year}</option>
+        ))}
+      </select>
     </div>
+  </div>
+</div>
   </div>
 </div>
 

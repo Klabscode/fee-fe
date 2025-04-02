@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { FileText, ArrowRight, ChevronLeft, Filter, Search, Calendar, ChevronDown, ChevronUp, Eye, Edit2, Lock, Unlock, AlertTriangle ,Trash2} from 'lucide-react';
+import { FileText, ArrowRight, ChevronLeft, Filter, Search, Calendar, ChevronDown, ChevronUp, Eye, Edit2, Lock, Unlock, AlertTriangle ,Trash2,CheckCircle, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import IndividualFeeCommitteeForm from '../components/induvidual-form';
 import api from '../api/api';
@@ -700,6 +700,18 @@ const handleUnfreezeForm = async (formId) => {
     setSubmitting(false);
   }
 };
+const formatDate = (dateString) => {
+  if (!dateString) return 'N/A';
+  
+  const date = new Date(dateString);
+  
+  // Format as DD.MM.YYYY
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).replace(/\//g, '.');
+};
 
   // Helper to render frozen badge
   const renderFrozenBadge = (form) => {
@@ -740,7 +752,7 @@ const handleUnfreezeForm = async (formId) => {
         </tr>
       );
     }
-    // For Admin and Entry users - add an actions column with clear label
+    // For Admin and Entry users - removed Classes and Location columns as requested
     return (
       <tr>
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
@@ -748,8 +760,6 @@ const handleUnfreezeForm = async (formId) => {
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">School ID</th>
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Principal</th>
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-        <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Classes</th>
-        <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Allocated To</th>
         <th className="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
         {userType === 'Admin' && (
@@ -762,94 +772,87 @@ const handleUnfreezeForm = async (formId) => {
   };
 
   const renderTableRow = (form) => {
-// For the Table Rows - clean, organized data presentation
-if (userType === 'Report') {
-  // Remove duplicates from the forms data in your state management
-  // This is just for the row rendering
-  return (
-    <tr key={form.id} className="hover:bg-gray-50">
-      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-        {new Date(form.formDate).toLocaleDateString()}
-      </td>
-      
-      <td className="px-4 py-3 text-sm text-gray-900">
-        <div className="font-medium">{form.schoolName || 'N/A'}</div>
-        <div className="text-xs text-gray-500">{form.localityType || 'N/A'}</div>
-        <div className="text-xs text-gray-500 max-w-xs truncate" title={form.address}>
-          {truncateAddress(form.locality)}
-        </div>
-        <div className="text-xs text-gray-500">Classes: {formatClasses(form.classesFunctioning)}</div>
-      </td>
-      
-      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-medium">
-        {form.feeformSchoolId || 'N/A'}
-      </td>
-      
-      <td className="px-4 py-3 text-sm text-gray-900">
-        <div className="font-medium">{form.correspondantOrPrincipalName || 'N/A'}</div>
-        <div className="text-xs text-gray-500">{form.mobileNumber1 || 'N/A'}</div>
-        <div className="text-xs text-gray-500">{form.email || 'N/A'}</div>
-      </td>
-      
-      <td className="px-4 py-3 text-sm text-gray-900">
-        {form.studentStrengthIndividual ? (
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              openDetailsModal(form, 'student');
-            }}
-            className="text-xs text-blue-600 hover:text-blue-800 flex items-center justify-center bg-blue-50 px-2 py-1 rounded-md w-full"
-            type="button"
-          >
-            <Eye className="h-3 w-3 mr-1" />
-            View Class-wise Details
-          </button>
-        ) : (
-          'N/A'
-        )}
-      </td>
-
-      <td className="px-4 py-3 text-sm text-gray-900">
-        {form.allocateformReference ? (
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              openDetailsModal(form, 'fee');
-            }}
-            className="text-xs text-blue-600 hover:text-blue-800 flex items-center justify-center bg-blue-50 px-2 py-1 rounded-md w-full"
-            type="button"
-          >
-            <Eye className="h-3 w-3 mr-1" />
-            View Complete Fee Details
-          </button>
-        ) : (
-          'N/A'
-        )}
-      </td>
-      
-      <td className="px-4 py-3 whitespace-nowrap">
-        <div className="flex items-center">
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            form.status === 'Completed' ? 'bg-green-100 text-green-800' : 
-            form.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 
-            form.status === 'Allocated' ? 'bg-blue-100 text-blue-800' :
-       
-            'bg-gray-100 text-gray-800'
-          }`}>
-            {form.status || 'Unknown'}
-          </span>
-          {renderEditRequestBadge(form)}
-          {renderFrozenBadge(form)}
-        </div>
-      </td>
-    </tr>
-  );
-}
-    else if (userType === 'Section') {
-      // Limited info for Section users, but add edit request button for completed forms
+    // For the Table Rows - clean, organized data presentation
+    if (userType === 'Report') {
+      // Report user view stays the same
       return (
         <tr key={form.id} className="hover:bg-gray-50">
-          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{new Date(form.formDate).toLocaleDateString()}</td>
+          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+            {formatDate(form.formDate)}
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-900">
+            <div className="font-medium">{form.schoolName || 'N/A'}</div>
+            <div className="text-xs text-gray-500">{form.localityType || 'N/A'}</div>
+            <div className="text-xs text-gray-500 max-w-xs truncate" title={form.address}>
+              {truncateAddress(form.locality)}
+            </div>
+            <div className="text-xs text-gray-500">Classes: {formatClasses(form.classesFunctioning)}</div>
+          </td>
+          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-medium">
+            {form.feeformSchoolId || 'N/A'}
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-900">
+            <div className="font-medium">{form.correspondantOrPrincipalName || 'N/A'}</div>
+            <div className="text-xs text-gray-500">{form.mobileNumber1 || 'N/A'}</div>
+            <div className="text-xs text-gray-500">{form.email || 'N/A'}</div>
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-900">
+            {form.studentStrengthIndividual ? (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDetailsModal(form, 'student');
+                }}
+                className="text-xs text-blue-600 hover:text-blue-800 flex items-center justify-center bg-blue-50 px-2 py-1 rounded-md w-full"
+                type="button"
+              >
+                <Eye className="h-3 w-3 mr-1" />
+                View Class-wise Details
+              </button>
+            ) : (
+              'N/A'
+            )}
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-900">
+            {form.allocateformReference ? (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDetailsModal(form, 'fee');
+                }}
+                className="text-xs text-blue-600 hover:text-blue-800 flex items-center justify-center bg-blue-50 px-2 py-1 rounded-md w-full"
+                type="button"
+              >
+                <Eye className="h-3 w-3 mr-1" />
+                View Complete Fee Details
+              </button>
+            ) : (
+              'N/A'
+            )}
+          </td>
+          <td className="px-4 py-3 whitespace-nowrap">
+            <div className="flex items-center">
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                form.status === 'Completed' ? 'bg-green-100 text-green-800' : 
+                form.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 
+                form.status === 'Allocated' ? 'bg-blue-100 text-blue-800' :
+                'bg-gray-100 text-gray-800'
+              }`}>
+                {form.status || 'Unknown'}
+              </span>
+              {renderEditRequestBadge(form)}
+              {renderFrozenBadge(form)}
+            </div>
+          </td>
+        </tr>
+      );
+    } else if (userType === 'Section') {
+      // Section user view stays the same
+      return (
+        <tr key={form.id} className="hover:bg-gray-50">
+          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+            {formatDate(form.formDate)}
+          </td>
           <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{form.feeformSchoolId || 'N/A'}</td>
           <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{formatClasses(form.classesFunctioning)}</td>
           <td className="px-4 py-3 text-sm text-gray-600">
@@ -857,20 +860,20 @@ if (userType === 'Report') {
             <div className="text-xs text-gray-500 max-w-xs truncate" title={form.locality}>{truncateAddress(form.locality, 20)}</div>
           </td>
           <td className="px-4 py-3 whitespace-nowrap">
-  <div className="flex items-center">
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-      form.status === 'Completed' ? 'bg-green-100 text-green-800' : 
-      form.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 
-      form.status === 'Allocated' ? 'bg-blue-100 text-blue-800' :
-      form.status === 'Not Allocated' ? 'bg-gray-100 text-gray-800' :
-      'bg-gray-100 text-gray-800'
-    }`}>
-      {form.status || 'Unknown'}
-    </span>
-    {renderEditRequestBadge(form)}
-    {renderFrozenBadge(form)}
-  </div>
-</td>
+            <div className="flex items-center">
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                form.status === 'Completed' ? 'bg-green-100 text-green-800' : 
+                form.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 
+                form.status === 'Allocated' ? 'bg-blue-100 text-blue-800' :
+                form.status === 'Not Allocated' ? 'bg-gray-100 text-gray-800' :
+                'bg-gray-100 text-gray-800'
+              }`}>
+                {form.status || 'Unknown'}
+              </span>
+              {renderEditRequestBadge(form)}
+              {renderFrozenBadge(form)}
+            </div>
+          </td>
           <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
             {form.status && form.status.trim() === 'Completed' ? (
               form.isFrozen ? (
@@ -911,10 +914,12 @@ if (userType === 'Report') {
       );
     }
     
-    // For Admin and Entry users
+    // For Admin and Entry users - removed Classes and Location columns
     return (
       <tr key={form.id} className="hover:bg-gray-50">
-        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{new Date(form.formDate).toLocaleDateString()}</td>
+        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+          {formatDate(form.formDate)}
+        </td>
         <td className="px-4 py-3 text-sm text-gray-900 max-w-xs">
           <div className="font-medium">{form.schoolName || 'N/A'}</div>
           <div className="text-xs text-gray-500">{form.correspondantOrPrincipal || 'N/A'}</div>
@@ -924,11 +929,6 @@ if (userType === 'Report') {
         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
           <div>{form.mobileNumber1 || 'N/A'}</div>
           <div className="text-xs text-gray-500 truncate">{form.email || 'N/A'}</div>
-        </td>
-        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{formatClasses(form.classesFunctioning)}</td>
-        <td className="px-4 py-3 text-sm text-gray-600">
-          <div>{form.localityType || 'N/A'}</div>
-          <div className="text-xs text-gray-500 max-w-xs truncate" title={form.locality}>{truncateAddress(form.locality, 20)}</div>
         </td>
         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
           {form.allocatedToSection?.userName || 'Not allocated'}
@@ -950,120 +950,116 @@ if (userType === 'Report') {
             {renderFrozenBadge(form)}
           </div>
         </td>
-
-
         {userType === 'Admin' && (
-  <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-    <div className="flex flex-row space-x-2 items-center">
-      {/* View/Edit Button */}
-      <button 
-        onClick={() => navigate(`/form-view-edit/${form.id}`)}
-        className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition-colors flex items-center justify-center"
-        type="button"
-      >
-        <Eye className="h-4 w-4 mr-1" />
-        View/Edit
-      </button>
-      
-      {/* Delete Button */}
-      <button 
-        onClick={() => {
-          if(window.confirm('Are you sure you want to delete this form? This action cannot be undone.')) {
-            // Add API call to delete the form
-            const deleteForm = async () => {
-              try {
-                setSubmitting(true);
-                const headers = { 'Authorization': token };
-                const response = await api.delete(`/deleteForm?id=${form.id}`, { headers });
-                
-                if (response?.status === 200) {
-                  // Remove the form from local state
-                  setForms(prevForms => prevForms.filter(f => f.id !== form.id));
-                  alert('Form deleted successfully');
-                } else {
-                  throw new Error('Failed to delete form');
-                }
-              } catch (error) {
-                console.error('Error deleting form:', error);
-                alert(`Error deleting form: ${error.message || 'Unknown error'}`);
-              } finally {
-                setSubmitting(false);
-              }
-            };
-            
-            deleteForm();
-          }
-        }}
-        className="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md transition-colors flex items-center justify-center"
-        disabled={submitting}
-        type="button"
-      >
-        <Trash2 className="h-4 w-4 mr-1" />
-        Delete
-      </button>
-      
-      {/* Reallocate Button - Now shown for all statuses */}
-      <button 
-        onClick={() => handleReallocate(form)}
-        className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md transition-colors flex items-center"
-        disabled={submitting}
-        type="button"
-      >
-        <ArrowRight className="h-4 w-4 mr-1" />
-        Reallocate
-      </button>
-      
-      {/* Edit Request Actions - Only for Completed forms */}
-      {form.status === 'Completed' && (
-        <>
-          {form.editRequestStatus === 'Requested' ? (
-            <>
+          <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium border-l border-gray-200">
+            <div className="flex flex-row items-center justify-end space-x-2">
               <button 
-                onClick={() => handleProcessEditRequest(form.id, 'approve')}
-                className="text-green-600 hover:text-green-900 bg-green-50 px-2 py-1 rounded-md transition-colors text-xs"
+                onClick={() => navigate(`/form-view-edit/${form.id}`)}
+                className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition-colors flex items-center justify-center"
+                type="button"
+              >
+                <Eye className="h-4 w-4 mr-1" />
+                View/Edit
+              </button>
+              
+              <button 
+                onClick={() => {
+                  if(window.confirm('Are you sure you want to delete this form? This action cannot be undone.')) {
+                    // Add API call to delete the form
+                    const deleteForm = async () => {
+                      try {
+                        setSubmitting(true);
+                        const headers = { 'Authorization': token };
+                        const response = await api.delete(`/deleteForm?id=${form.id}`, { headers });
+                        
+                        if (response?.status === 200) {
+                          // Remove the form from local state
+                          setForms(prevForms => prevForms.filter(f => f.id !== form.id));
+                          alert('Form deleted successfully');
+                        } else {
+                          throw new Error('Failed to delete form');
+                        }
+                      } catch (error) {
+                        console.error('Error deleting form:', error);
+                        alert(`Error deleting form: ${error.message || 'Unknown error'}`);
+                      } finally {
+                        setSubmitting(false);
+                      }
+                    };
+                    
+                    deleteForm();
+                  }
+                }}
+                className="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md transition-colors flex items-center justify-center"
                 disabled={submitting}
                 type="button"
               >
-                Approve
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete
               </button>
+              
               <button 
-                onClick={() => handleProcessEditRequest(form.id, 'reject')}
-                className="text-red-600 hover:text-red-900 bg-red-50 px-2 py-1 rounded-md transition-colors text-xs"
+                onClick={() => handleReallocate(form)}
+                className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md transition-colors flex items-center"
                 disabled={submitting}
                 type="button"
               >
-                Reject
+                <ArrowRight className="h-4 w-4 mr-1" />
+                Reallocate
               </button>
-            </>
-          ) : (
-            form.isFrozen ? (
-              <button 
-                onClick={() => handleUnfreezeForm(form.id)}
-                className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition-colors flex items-center"
-                disabled={submitting}
-                type="button"
-              >
-                <Unlock className="h-4 w-4 mr-1" />
-                Unfreeze
-              </button>
-            ) : (
-              <button 
-                onClick={() => handleFreezeForm(form.id)}
-                className="text-gray-600 hover:text-gray-900 bg-gray-50 px-3 py-1 rounded-md transition-colors flex items-center"
-                disabled={submitting}
-                type="button"
-              >
-                <Lock className="h-4 w-4 mr-1" />
-                Freeze
-              </button>
-            )
-          )}
-        </>
-      )}
-    </div>
-  </td>
-)}
-
+              
+              {/* Edit Request Actions - Only for Completed forms */}
+              {form.status === 'Completed' && (
+                <div className="flex space-x-2">
+                  {form.editRequestStatus === 'Requested' ? (
+                    <>
+                      <button 
+                        onClick={() => handleProcessEditRequest(form.id, 'approve')}
+                        className="text-green-600 hover:text-green-900 bg-green-50 px-2 py-1 rounded-md transition-colors text-xs flex items-center"
+                        disabled={submitting}
+                        type="button"
+                      >
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Approve
+                      </button>
+                      <button 
+                        onClick={() => handleProcessEditRequest(form.id, 'reject')}
+                        className="text-red-600 hover:text-red-900 bg-red-50 px-2 py-1 rounded-md transition-colors text-xs flex items-center"
+                        disabled={submitting}
+                        type="button"
+                      >
+                        <XCircle className="h-3 w-3 mr-1" />
+                        Reject
+                      </button>
+                    </>
+                  ) : (
+                    form.isFrozen ? (
+                      <button 
+                        onClick={() => handleUnfreezeForm(form.id)}
+                        className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition-colors flex items-center"
+                        disabled={submitting}
+                        type="button"
+                      >
+                        <Unlock className="h-4 w-4 mr-1" />
+                        Unfreeze
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => handleFreezeForm(form.id)}
+                        className="text-gray-600 hover:text-gray-900 bg-gray-50 px-3 py-1 rounded-md transition-colors flex items-center"
+                        disabled={submitting}
+                        type="button"
+                      >
+                        <Lock className="h-4 w-4 mr-1" />
+                        Freeze
+                      </button>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
+          </td>
+        )}
       </tr>
     );
   };

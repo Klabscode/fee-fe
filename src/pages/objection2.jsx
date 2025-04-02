@@ -164,9 +164,12 @@ const AccountTwoFormat = ({schoolDetails}) => {
         </div>
 
         {/* Second Table */}
-        <div className="overflow-x-auto mb-24">
+        <div className="overflow-x-auto mb-4">
+        <div className="flex justify-end items-start -mb-4">
+          <p className="text-sm">School Code: {schoolDetails?.code || ''}</p>
+        </div>
           <h3 className="font-semibold mb-4">Account II B</h3>
-          <table className="w-full border-collapse border border-gray-300 table-fixed mb-56">
+          <table className="w-full border-collapse border border-gray-300 table-fixed mb-48">
             <TableHeader />
             <tbody>
               <tr>
@@ -258,9 +261,13 @@ const AccountTwoFormat = ({schoolDetails}) => {
         </div>
 
 {/* Third Table */}
-<div className="overflow-x-auto mb-2">
+<div className="overflow-x-auto ">
+<div className="flex justify-end items-start -mb-4">
+          <p className="text-sm">School Code: {schoolDetails?.code || ''}</p>
+        </div>
+
           <h3 className="font-semibold mb-2">Account II C</h3>
-          <table className="w-full border-collapse border border-gray-300 table-fixed mb-2">
+          <table className="w-full border-collapse border border-gray-300 table-fixed">
             <TableHeader />
             <tbody>
               <tr>
